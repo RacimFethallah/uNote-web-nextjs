@@ -153,10 +153,7 @@ export default async function Aside() {
 
                             <ScrollArea className="flex-1 overflow-y-auto">
                                 <nav className="p-2 text-base">
-                                    {/* <ul ref={listRef} className='space-y-2'> */}
                                     <ul className='space-y-2'>
-
-
                                         <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg`}
                                         >
                                             <CiStar size={24} /> Favoris
@@ -180,7 +177,6 @@ export default async function Aside() {
                             <ListForm />
                             <div className='flex justify-center'>
                                 <Switch className='mb-2 mt-2' />
-
                             </div>
 
                             {/* {isDrawerOpen ? (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { addNewList } from "@/app/actions";
 
@@ -17,9 +17,11 @@ export default function ListForm() {
 
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            if (newListInputValue.trim() !== '') {
-                await addNewList(newListInputValue);
+            var listInput = newListInputValue.trim();
+            if (listInput !== '' && listInput != 'Favoris' && listInput != 'Mes Notes') {
+                await addNewList(listInput);
                 setNewListInputValue('');
+
             }
         }
     };
