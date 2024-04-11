@@ -7,6 +7,18 @@ import { eq, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
 
 
+export const deleteEverything = async () => {
+    try {
+      await db.delete(notes);
+      await db.delete(lists);
+      const remainingLists = await db.select().from(lists);
+      console.log('Everything deleted');
+      console.log('Remaining lists:', remainingLists);
+    } catch (error) {
+      console.error('Error deleting everything:', error);
+    }
+  };
+
 export const setupDefaultLists = async () => {
     try {
         const defaultLists = [
@@ -20,7 +32,7 @@ export const setupDefaultLists = async () => {
             .from(lists)
             .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
 
-        const alllists = await db.select().from(lists).all();
+        const alllists = await db.select().from(lists);
 
         console.log('All lists' , alllists);
         console.log('Existing lists:', existingLists);
@@ -29,13 +41,15 @@ export const setupDefaultLists = async () => {
             (list) => !existingLists.some((existingList) => existingList.name === list.name)
         );
 
-        
+
         console.log('Missing lists:', missingLists);
 
         if (missingLists.length > 0) {
             await db.insert(lists).values(missingLists);
             console.log('Default lists created');
         }
+
+        revalidatePath('/');
     } catch (error) {
         console.error('Error setting up default lists:', error);
     }
@@ -177,4 +191,20 @@ export async function addToFavorite(noteId: number){
         throw error;
     }
 
+}
+
+
+
+export async function removeFromFavorite(noteId: number){
+    try {
+        await db
+            .update(notes)
+            .set({ listId: 1 })
+            .where(eq(notes.id, noteId));
+
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error updating note:', error);
+        throw error;
+    }
 }

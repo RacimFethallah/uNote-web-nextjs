@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { ResizablePanel } from './ui/resizable';
-import { addToFavorite, updateNote } from '@/app/actions';
+import { addToFavorite, removeFromFavorite, updateNote } from '@/app/actions';
 import { time } from 'console';
 import { CiStar } from 'react-icons/ci';
+import { GoStarFill, GoStar } from "react-icons/go";
 
 const Editor = dynamic(() => import('@/components/editor'), { ssr: false });
 
@@ -37,9 +38,13 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
         }
     }, [selectedNote, isNoteModified, updateNote]);
 
-    const setFavorite = async (id: number) =>  {
+    const setFavorite = async (id: number) => {
         await addToFavorite(id);
-        
+
+    }
+    const removeFavorite = async (id: number) => {
+        await removeFromFavorite(id);
+
     }
 
     return (
@@ -77,7 +82,11 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
                                     });
                                 })()}
                             </p>
-                            <span className='ml-auto cursor-pointer' onClick={() => setFavorite(selectedNote.id)}><CiStar size={24} /> </span>
+                            <span className='ml-auto cursor-pointer' onClick={() => 
+                                {selectedNote.listId === 0 ? removeFavorite(selectedNote.id) : setFavorite(selectedNote.id)}}>
+                                {selectedNote.listId === 0 ? <GoStarFill size={24} /> : <GoStar size={24} />}
+
+                            </span>
 
                         </div>
 

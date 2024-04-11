@@ -24,7 +24,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { addNewList, addNewNote, deleteList, deleteNote, fetchLists, fetchNotesFromList } from '@/app/actions';
+import { addNewList, addNewNote, deleteList, deleteNote, fetchLists, fetchNotesFromList, setupDefaultLists } from '@/app/actions';
 
 
 import {
@@ -58,9 +58,11 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
     const [notes, setNotes] = useState<Note[]>([]);
 
     useEffect(() => {
-
-        setSelectedList(lists.find(list => list.name === 'Mes Notes') || null);
-
+        const setup = async () => {
+            await setupDefaultLists();
+            setTimeout(() => { setSelectedList(lists.find(list => list.id === 1) || null); }, 10);
+        };
+        setup();
     }, []);
 
 
