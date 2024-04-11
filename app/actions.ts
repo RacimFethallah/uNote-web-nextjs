@@ -18,7 +18,7 @@ export const setupDefaultLists = async () => {
             .select()
             .from(lists)
             .where(or(...defaultLists.map((list) => eq(lists.name, list.name))));
-        
+
         console.log('Existing lists:', existingLists);
 
         const missingLists = defaultLists.filter(
@@ -40,13 +40,44 @@ export const setupDefaultLists = async () => {
 
 export async function addNewList(listName: string) {
     try {
-             await db
+        await db
             .insert(lists)
             .values({ name: listName.trim() });
-        
+
         revalidatePath('/');
     } catch (error) {
         console.error('Error inserting new list:', error);
         throw error;
     }
 };
+
+
+export async function deleteList(listId: number) {
+    try {
+        await db
+            .delete(lists)
+            .where(eq(lists.id, listId));
+
+            
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error deleting list:', error);
+        throw error;
+    }
+
+}
+
+
+export async function fetchLists() {
+    try {
+        const Lists = await db
+            .select()
+            .from(lists)
+            // .orderBy(lists.name.asc)
+            .all();
+        return Lists;
+    } catch (error) {
+        console.error('Error fetching lists:', error);
+        throw error;
+    }
+}

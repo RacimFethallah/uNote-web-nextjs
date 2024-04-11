@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import Aside from "@/components/aside";
 import Main from "@/components/main";
@@ -7,13 +7,13 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function Home() {
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  // const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   return (
     <>
     <ResizablePanelGroup direction="horizontal">
-      <Aside setSelectedNote={setSelectedNote} />
+      <Aside />
       <ResizableHandle disabled={true} />
-      <Main selectedNote={selectedNote} />
+      <Main  />
       </ResizablePanelGroup>
     </>
   );
