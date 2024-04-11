@@ -1,20 +1,24 @@
 // "use client";
 
 import Aside from "@/components/aside";
+import HomePage from "@/components/homePage";
 import Main from "@/components/main";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable";
 import Image from "next/image";
 import { useState } from "react";
+import { fetchLists } from "./actions";
 
-export default function Home() {
-  // const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+export default async function Home() {
+
+  const lists = await fetchLists();
+
+
+
   return (
     <>
-    <ResizablePanelGroup direction="horizontal">
-      <Aside />
-      <ResizableHandle disabled={true} />
-      <Main  />
-      </ResizablePanelGroup>
+      <HomePage lists={lists} />
     </>
   );
 }
+
+

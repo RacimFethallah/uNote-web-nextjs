@@ -1,5 +1,5 @@
-// "use client";
-import { useState, useEffect, useRef } from 'react';
+"use client";
+import { useState, useEffect, useRef, use } from 'react';
 import { AiOutlineUser } from "react-icons/ai";
 import { CgPushChevronLeft, CgPushChevronRight } from "react-icons/cg";
 import { IoSettingsOutline, IoAddOutline } from "react-icons/io5";
@@ -24,7 +24,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { addNewList, deleteList, fetchLists } from '@/app/actions';
+import { addNewList, addNewNote, deleteList, fetchLists, fetchNotesFromList } from '@/app/actions';
 
 
 import {
@@ -36,16 +36,47 @@ import listForm from './listForm';
 import ListForm from './listForm';
 import ListItem from './listItem';
 import React from 'react';
+import NoteForm from './noteForm';
+//import NoteForm from './noteForm';
+
+interface List {
+    id: number;
+    name: string;
+}
+
+interface Note {
+    id: number;
+    listId: number;
+    title: string;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export default function Aside({ lists }: { lists: List[] }) {
+
+    const [selectedList, setSelectedList] = useState<List | null>(null);
+    const [notes, setNotes] = useState<Note[]>([]);
 
 
+    const handleListItemClick = async (list: List) => {
+        setSelectedList(list);
+
+        fetchNotesFromList(list.id).then((notes) => {
+            setNotes(notes);
+        });
+
+    };
 
 
-export default async function Aside() {
-
-    const lists = await fetchLists();
-
-
-
+    const handleNewNoteSubmit = async (noteTitle: string) => {
+        if (selectedList && selectedList.id != -1) {
+            await addNewNote(noteTitle, selectedList.id);
+            fetchNotesFromList(selectedList.id).then((notes) => {
+                setNotes(notes);
+            });
+        }
+    };
 
 
     // const toggleDrawer = () => {
@@ -88,17 +119,7 @@ export default async function Aside() {
     //     setNewNoteInputValue(e.target.value);
     // };
 
-    // useEffect(() => {
-    //     const handleListUpdate = () => {
-    //         if (selectedList) {
-    //             const updatedList = lists.find((list) => list.id === selectedList.id);
-    //             if (updatedList) {
-    //                 setSelectedList(updatedList);
-    //             }
-    //         }
-    //     };
-    //     handleListUpdate();
-    // }, [selectedList, lists]);
+
 
     // useEffect(() => {
     //     const favoritesList: List = {
@@ -115,20 +136,6 @@ export default async function Aside() {
     //     // Set the lists state with predefined lists
     //     setLists([favoritesList, mesNotesList]);
     // }, []);
-
-    // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    //     if (e.key === 'Enter') {
-    //         if (newListInputValue.trim() !== '') {
-    //             addList();
-    //         } else if (newNoteInputValue.trim() !== '' && selectedList) {
-    //             handleAddNewNote();
-    //         }
-    //         setTimeout(() => {
-    //             const newItem = listRef.current?.lastElementChild;
-    //             newItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    //         }, 100);
-    //     }
-    // };
 
     return (
         <ResizablePanel className='' defaultSize={40} maxSize={40} minSize={40}>
@@ -168,7 +175,7 @@ export default async function Aside() {
                                         <hr />
                                         {lists.filter(list => list.name !== 'Favoris' && list.name !== 'Mes Notes').map((list, index) => (
                                             <React.Fragment key={index}>
-                                                <ListItem {...list} />
+                                                <ListItem {...list} onClick={() => handleListItemClick(list)} />
                                             </React.Fragment>
                                         ))}
                                     </ul>
@@ -276,26 +283,16 @@ export default async function Aside() {
                     <ResizableHandle />
                     <ResizablePanel defaultSize={40} className=''>
                         <section className="p-4 h-screen flex flex-col">
-                            <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis "></h2>
-                            <div className=''>
-                                <Input
-                                    required={true}
-                                    placeholder="+ New Note"
-                                    // onSubmit={handleAddNewNote}
-                                    // onChange={handleNewNoteInputChange}
-                                    // value={newNoteInputValue}
-                                    // onKeyDown={handleKeyDown}
-                                    className="border-2 border-gray-400 focus:border-gray-500 focus:bg-slate-200 transition-colors duration-300 focus-visible:ring-transparent bg-slate-50 text-black "
-                                />
-                            </div>
-
-                            {/* {selectedList && (
-                                <ScrollArea className="flex-1 pr-5">
+                            <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
+                                {selectedList?.name || ''}
+                            </h2>
+                            <NoteForm onSubmit={handleNewNoteSubmit} />
+                            {selectedList && (
+                                <ScrollArea className="flex-1 ">
                                     <ul className='space-y-3 pt-3'>
-                                        {selectedList.notes.slice().reverse().map(note => (
-                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNoteState?.id === note.id ? 'bg-slate-50 border-black' : 'bg-white'}`}
-                                                style={{ overflow: 'hidden' }}
-                                                onClick={() => handleNoteClick(note)}>
+                                        {notes.slice().reverse().map(note => (
+                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300`}
+                                                style={{ overflow: 'hidden' }}>
                                                 <CardHeader className=''>
                                                     <div className='flex flex-row text-sm'>
                                                         {new Intl.DateTimeFormat('fr', { month: 'short', day: 'numeric' }).format(note.createdAt)}
@@ -303,8 +300,7 @@ export default async function Aside() {
                                                             <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
                                                             <DropdownMenuContent>
                                                                 <DropdownMenuItem className='cursor-pointer'>
-                                                                    <div className='flex flex-row text-red-500 items-center gap-5'
-                                                                        onClick={() => handleDeleteNote(note.id)}>
+                                                                    <div className='flex flex-row text-red-500 items-center gap-5'>
                                                                         <FaTrash /> Delete
                                                                     </div> </DropdownMenuItem>
                                                             </DropdownMenuContent>
@@ -322,7 +318,7 @@ export default async function Aside() {
                                         ))}
                                     </ul>
                                 </ScrollArea>
-                            )} */}
+                            )}
                         </section>
                     </ResizablePanel>
                 </aside>
@@ -331,6 +327,8 @@ export default async function Aside() {
         </ResizablePanel>
     );
 }
+
+
 
 
 

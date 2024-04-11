@@ -5,13 +5,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BsThreeDots } from "react-icons/bs";
 import { FaTrash } from "react-icons/fa";
 import { deleteList } from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 interface ListItemProps {
     id: number;
     name: string;
+    onClick: () => void;
 }
 
 export default function ListItem(list: ListItemProps) {
+    const router = useRouter();
+
+    const handleClick = () => {
+        //router.push(`/lists/${list.id}`);
+        list.onClick();
+    };
 
 
 
@@ -19,7 +27,8 @@ export default function ListItem(list: ListItemProps) {
         await deleteList(listId);
     };
 
-    return <li className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group`}>
+    return <li className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group`}
+        onClick={() => handleClick()}>
         <CiViewList size={24} />
         <span className=' w-32 overflow-hidden whitespace-nowrap text-ellipsis'>
             {list.name}

@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/db";
-import { lists } from "@/db/schema";
+import { lists, notes } from "@/db/schema";
 import { eq, lt, gte, ne, or } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
 
@@ -51,6 +51,19 @@ export async function addNewList(listName: string) {
     }
 };
 
+export async function addNewNote(noteTitle: string, listId: number) {
+    try {
+        await db
+            .insert(notes)
+            .values({ title: noteTitle.trim(), listId: listId, content: '' });
+
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error inserting new note:', error);
+        throw error;
+    }
+}
+
 
 export async function deleteList(listId: number) {
     try {
@@ -58,7 +71,7 @@ export async function deleteList(listId: number) {
             .delete(lists)
             .where(eq(lists.id, listId));
 
-            
+
         revalidatePath('/');
     } catch (error) {
         console.error('Error deleting list:', error);
@@ -80,4 +93,15 @@ export async function fetchLists() {
         console.error('Error fetching lists:', error);
         throw error;
     }
+}
+
+export async function fetchNotesFromList(listId: number) {
+    try {
+        const Notes = await db.select().from(notes).where(eq(notes.listId, listId))
+        return Notes;
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+        throw error;
+    }
+
 }
