@@ -3,7 +3,7 @@
 import { db } from "@/db/db";
 import { lists, notes } from "@/db/schema";
 import { count, sql } from 'drizzle-orm';
-import { eq, lt, gte, ne, or } from 'drizzle-orm';
+import { eq, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
 
 
@@ -54,11 +54,12 @@ export async function addNewList(listName: string) {
 
 export async function addNewNote(noteTitle: string, listId: number) {
     try {
-        await db
+        const insertedNote =await db
             .insert(notes)
-            .values({ title: noteTitle.trim(), listId: listId, content: '' });
+            .values({ title: noteTitle.trim(), listId: listId, content: '' }).returning();
 
         revalidatePath('/');
+        return insertedNote;
     } catch (error) {
         console.error('Error inserting new note:', error);
         throw error;
@@ -112,7 +113,7 @@ export async function fetchLists() {
 
 export async function fetchNotesFromList(listId: number) {
     try {
-        const Notes = await db.select().from(notes).where(eq(notes.listId, listId))
+        const Notes = (await db.select().from(notes).orderBy(asc(notes.title)).where(eq(notes.listId, listId)));
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -125,4 +126,20 @@ export async function getNotesCountForList(listId: number) {
     const notesCount = await db.select({ count: sql<number>`count(*)` }).from(notes).where(eq(notes.listId, listId));
     revalidatePath('/');
     return notesCount;
+}
+
+
+
+export async function updateNote(noteId: number, content: string, updatedAt: string) {
+    try {
+        await db
+            .update(notes)
+            .set({ content: content, updatedAt: updatedAt })
+            .where(eq(notes.id, noteId));
+
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error updating note:', error);
+        throw error;
+    }
 }

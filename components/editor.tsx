@@ -18,7 +18,14 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
     }
 }
 
-
+interface Note {
+    id: number;
+    listId: number;
+    title: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+  }
 
 export default function Editor({ note, onChange }: { note: Note | null; onChange: (content: string) => void }) {
     const ref = React.useRef<MDXEditorMethods>(null);

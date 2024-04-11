@@ -8,14 +8,20 @@ import { deleteList, getNotesCountForList } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+interface List {
+    id: number;
+    name: string;
+}
+
 interface ListItemProps {
     id: number;
     name: string;
     onClick: () => void;
     notes: number;
+    selectedList:List | null;
 }
 
-export default function ListItem({ id, name, onClick, notes }: ListItemProps) {
+export default function ListItem({ id, name, onClick, notes, selectedList }: ListItemProps) {
     const handleClick = () => {
         onClick();
     };
@@ -26,16 +32,16 @@ export default function ListItem({ id, name, onClick, notes }: ListItemProps) {
 
     return (
         <li
-            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group`}
+            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList?.id === id ? 'bg-white' : ''}`}
             onClick={() => handleClick()}
         >
             <CiViewList size={24} />
-            <span className=" w-32 overflow-hidden whitespace-nowrap text-ellipsis">
+            <span className=" w-28 overflow-hidden whitespace-nowrap text-ellipsis">
                 {name}
             </span>
             
             {notes > 0 && (
-                <span className=' rounded-lg bg-slate-200 ml-3 px-1.5 '>
+                <span className=' rounded-lg bg-slate-200 px-1.5 '>
                     {notes}
                 </span>
             )}

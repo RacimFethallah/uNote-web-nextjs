@@ -4,11 +4,11 @@ import { sql } from "drizzle-orm";
 
 export const notes = sqliteTable('notes', {
     id: integer('id' , { mode: 'number' }).primaryKey({ autoIncrement: true }).notNull(),
-    listId: integer('listId').notNull().references(() => lists.id),
+    listId: integer('listId').notNull().references(() => lists.id, {onDelete: 'cascade'}),
     title: text('title').notNull(),
     content: text('content').notNull(),
-    createdAt: integer('createdAt', { mode: 'timestamp' }).default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' }).default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    createdAt: text("createdAt").default(sql`(CURRENT_DATE)`).notNull(),
+    updatedAt: text("updatedAt").default(sql`(CURRENT_DATE)`).notNull(),
 });
 
 

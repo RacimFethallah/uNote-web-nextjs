@@ -23,7 +23,7 @@ interface NoteFormProps {
     };
   
     return (
-      <div className="">
+      <div className="pr-4">
         <Input
           required={true}
           placeholder="+ New Note"

@@ -48,21 +48,33 @@ interface Note {
     listId: number;
     title: string;
     content: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
 
-export default function Aside({ lists }: { lists: List[] }) {
+export default function Aside({ lists, selectedNote, setSelectedNote }: { lists: List[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
 
     const [selectedList, setSelectedList] = useState<List | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
 
+    useEffect(() => {
+
+        setSelectedList(lists.find(list => list.name === 'Mes Notes') || null);
+
+    }, []);
+
+
+
+    const handleNoteClick = (note: Note) => {
+        setSelectedNote(note);
+    };
 
     const handleListItemClick = async (list: List) => {
         setSelectedList(list);
 
         fetchNotesFromList(list.id).then((notes) => {
             setNotes(notes);
+            console.log(notes);
         });
 
     };
@@ -70,7 +82,8 @@ export default function Aside({ lists }: { lists: List[] }) {
 
     const handleNewNoteSubmit = async (noteTitle: string) => {
         if (selectedList && selectedList.id != -1) {
-            await addNewNote(noteTitle, selectedList.id);
+            const insertedNote = await addNewNote(noteTitle, selectedList.id);
+            handleNoteClick(insertedNote[0]);
             fetchNotesFromList(selectedList.id).then((notes) => {
                 setNotes(notes);
             });
@@ -111,15 +124,25 @@ export default function Aside({ lists }: { lists: List[] }) {
                             <ScrollArea className="flex-1 overflow-y-auto">
                                 <nav className="p-2 text-base">
                                     <ul className='space-y-2'>
-                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg`}
-                                        >
+                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Favoris' ? 'bg-white' : ''}`}
+                                            onClick={() => handleListItemClick(lists.find(list => list.name === 'Favoris') as List)}>
                                             <CiStar size={24} /> Favoris
+                                            {notes.length > 0 && selectedList?.name === 'Favoris' && (
+                                                <span className=' rounded-lg bg-slate-200 px-1.5 '>
+                                                    {notes.length}
+                                                </span>
+                                            )}
                                             <BsThreeDots className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={20} />
                                         </li>
-                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg`}
-                                        >
+                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Mes Notes' ? 'bg-white' : ''}`}
+                                            onClick={() => handleListItemClick(lists.find(list => list.name === 'Mes Notes') as List)}>
                                             <CiStickyNote size={24} />
                                             Mes notes
+                                            {notes.length > 0 && selectedList?.name === 'Mes Notes' && (
+                                                <span className=' rounded-lg bg-slate-200 px-1.5 '>
+                                                    {notes.length}
+                                                </span>
+                                            )}
                                             <BsThreeDots className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={20} />
                                         </li>
                                         <hr />
@@ -128,7 +151,8 @@ export default function Aside({ lists }: { lists: List[] }) {
                                                 <ListItem
                                                     {...list}
                                                     onClick={() => handleListItemClick(list)}
-                                                    notes={notes.filter((note) => note.listId === list.id).length} />
+                                                    notes={notes.filter((note) => note.listId === list.id).length}
+                                                    selectedList={selectedList} />
                                             </React.Fragment>
                                         ))}
                                     </ul>
@@ -146,20 +170,26 @@ export default function Aside({ lists }: { lists: List[] }) {
                     </ResizablePanel>
                     <ResizableHandle />
                     <ResizablePanel defaultSize={40} className=''>
-                        <section className="p-4 h-screen flex flex-col">
+                        <section className="pl-4 pt-4 h-screen flex flex-col">
                             <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
                                 {selectedList?.name || ''}
                             </h2>
                             <NoteForm onSubmit={handleNewNoteSubmit} />
                             {selectedList && (
-                                <ScrollArea className="flex-1 ">
+                                <ScrollArea className="flex-1 pr-4">
                                     <ul className='space-y-3 pt-3'>
-                                        {notes.slice().reverse().map(note => (
-                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300`}
-                                                style={{ overflow: 'hidden' }}>
+                                        {notes.map(note => (
+                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote?.id === note.id ? 'bg-slate-50 border-black' : 'bg-white'}`}
+                                                style={{ overflow: 'hidden' }}
+                                                onClick={() => handleNoteClick(note)}>
                                                 <CardHeader className=''>
                                                     <div className='flex flex-row text-sm'>
-                                                        {new Intl.DateTimeFormat('fr', { month: 'short', day: 'numeric' }).format(note.createdAt)}
+                                                        {(() => {
+                                                            const createdAtDate = new Date(note.createdAt);
+                                                            const shortMonth = createdAtDate.toLocaleString('default', { month: 'short' });
+                                                            const dayNumber = createdAtDate.getDate();
+                                                            return `${shortMonth} ${dayNumber}`;
+                                                        })()}
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
                                                             <DropdownMenuContent>
