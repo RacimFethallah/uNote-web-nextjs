@@ -24,12 +24,12 @@ interface Note {
 
 
 
-export default function HomePage({ lists }: { lists: List[] }) {
+export default function HomePage({ lists, notes }: { lists: List[], notes: Note[] }) {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
 
   return <ResizablePanelGroup direction="horizontal">
-    <Aside lists={lists} selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
+    <Aside lists={lists} Notes={notes} selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
     <ResizableHandle disabled={true} />
     <Main selectedNote={selectedNote} />
   </ResizablePanelGroup>;

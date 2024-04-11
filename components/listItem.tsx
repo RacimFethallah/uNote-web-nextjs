@@ -18,7 +18,7 @@ interface ListItemProps {
     name: string;
     onClick: () => void;
     notes: number;
-    selectedList:List | null;
+    selectedList: List | null;
 }
 
 export default function ListItem({ id, name, onClick, notes, selectedList }: ListItemProps) {
@@ -39,12 +39,14 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
             <span className=" w-28 overflow-hidden whitespace-nowrap text-ellipsis">
                 {name}
             </span>
-            
+
             {notes > 0 && (
                 <span className=' rounded-lg bg-slate-200 px-1.5 '>
                     {notes}
                 </span>
             )}
+
+
             <DropdownMenu>
                 <DropdownMenuTrigger className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <BsThreeDots size={20} />

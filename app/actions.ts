@@ -113,13 +113,28 @@ export async function fetchLists() {
 
 export async function fetchNotesFromList(listId: number) {
     try {
-        const Notes = (await db.select().from(notes).orderBy(asc(notes.title)).where(eq(notes.listId, listId)));
+        const Notes = (await db.select().from(notes).where(eq(notes.listId, listId))).toReversed();
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
         throw error;
     }
 
+}
+
+
+export async function fetchNotes() {
+    try {
+        const Notes = await db
+            .select()
+            .from(notes)
+            // .orderBy(lists.name.asc)
+            .all();
+        return Notes;
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+        throw error;
+    }
 }
 
 export async function getNotesCountForList(listId: number) {

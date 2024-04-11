@@ -6,17 +6,19 @@ import Main from "@/components/main";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable";
 import Image from "next/image";
 import { useState } from "react";
-import { fetchLists } from "./actions";
+import { fetchLists, fetchNotes } from "./actions";
 
 export default async function Home() {
 
   const lists = await fetchLists();
 
+  const notes = await fetchNotes();
+
 
 
   return (
     <>
-      <HomePage lists={lists} />
+      <HomePage lists={lists} notes={notes} />
     </>
   );
 }

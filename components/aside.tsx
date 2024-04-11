@@ -52,7 +52,7 @@ interface Note {
     updatedAt: string;
 }
 
-export default function Aside({ lists, selectedNote, setSelectedNote }: { lists: List[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
+export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: { lists: List[], Notes: Note[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
 
     const [selectedList, setSelectedList] = useState<List | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
@@ -101,6 +101,11 @@ export default function Aside({ lists, selectedNote, setSelectedNote }: { lists:
 
     }
 
+    const getNoteCount = (listName: string) => {
+        const list = lists.find((l) => l.name === listName);
+        return list ? Notes.filter((note) => note.listId === list.id).length : 0;
+    };
+
     return (
         <ResizablePanel className='' defaultSize={40} maxSize={40} minSize={40}>
             <ResizablePanelGroup direction='horizontal'>
@@ -124,26 +129,23 @@ export default function Aside({ lists, selectedNote, setSelectedNote }: { lists:
                             <ScrollArea className="flex-1 overflow-y-auto">
                                 <nav className="p-2 text-base">
                                     <ul className='space-y-2'>
-                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Favoris' ? 'bg-white' : ''}`}
-                                            onClick={() => handleListItemClick(lists.find(list => list.name === 'Favoris') as List)}>
+                                        <li
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Favoris' ? 'bg-white' : ''}`}
+                                            onClick={() => handleListItemClick(lists.find((list) => list.name === 'Favoris') as List)}
+                                        >
                                             <CiStar size={24} /> Favoris
-                                            {notes.length > 0 && selectedList?.name === 'Favoris' && (
-                                                <span className=' rounded-lg bg-slate-200 px-1.5 '>
-                                                    {notes.length}
-                                                </span>
+                                            {getNoteCount('Favoris') > 0 && (
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Favoris')}</span>
                                             )}
-                                            <BsThreeDots className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={20} />
                                         </li>
-                                        <li className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Mes Notes' ? 'bg-white' : ''}`}
-                                            onClick={() => handleListItemClick(lists.find(list => list.name === 'Mes Notes') as List)}>
-                                            <CiStickyNote size={24} />
-                                            Mes notes
-                                            {notes.length > 0 && selectedList?.name === 'Mes Notes' && (
-                                                <span className=' rounded-lg bg-slate-200 px-1.5 '>
-                                                    {notes.length}
-                                                </span>
+                                        <li
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Mes Notes' ? 'bg-white' : ''}`}
+                                            onClick={() => handleListItemClick(lists.find((list) => list.name === 'Mes Notes') as List)}
+                                        >
+                                            <CiStickyNote size={24} /> Mes notes
+                                            {getNoteCount('Mes Notes') > 0 && (
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Mes Notes')}</span>
                                             )}
-                                            <BsThreeDots className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={20} />
                                         </li>
                                         <hr />
                                         {lists.filter(list => list.name !== 'Favoris' && list.name !== 'Mes Notes').map((list, index) => (
@@ -151,7 +153,7 @@ export default function Aside({ lists, selectedNote, setSelectedNote }: { lists:
                                                 <ListItem
                                                     {...list}
                                                     onClick={() => handleListItemClick(list)}
-                                                    notes={notes.filter((note) => note.listId === list.id).length}
+                                                    notes={Notes.filter((note) => note.listId === list.id).length}
                                                     selectedList={selectedList} />
                                             </React.Fragment>
                                         ))}
@@ -178,7 +180,7 @@ export default function Aside({ lists, selectedNote, setSelectedNote }: { lists:
                             {selectedList && (
                                 <ScrollArea className="flex-1 pr-4">
                                     <ul className='space-y-3 pt-3'>
-                                        {notes.map(note => (
+                                        {Notes.filter(note => note.listId === selectedList.id).slice().reverse().map(note => (
                                             <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote?.id === note.id ? 'bg-slate-50 border-black' : 'bg-white'}`}
                                                 style={{ overflow: 'hidden' }}
                                                 onClick={() => handleNoteClick(note)}>
