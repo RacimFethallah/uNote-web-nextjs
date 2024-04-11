@@ -2,6 +2,7 @@
 
 import { db } from "@/db/db";
 import { lists, notes } from "@/db/schema";
+import { count, sql } from 'drizzle-orm';
 import { eq, lt, gte, ne, or } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
 
@@ -81,6 +82,20 @@ export async function deleteList(listId: number) {
 }
 
 
+export async function deleteNote(noteId: number) {
+    try {
+        await db
+            .delete(notes)
+            .where(eq(notes.id, noteId));
+
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        throw error;
+    }
+}
+
+
 export async function fetchLists() {
     try {
         const Lists = await db
@@ -104,4 +119,10 @@ export async function fetchNotesFromList(listId: number) {
         throw error;
     }
 
+}
+
+export async function getNotesCountForList(listId: number) {
+    const notesCount = await db.select({ count: sql<number>`count(*)` }).from(notes).where(eq(notes.listId, listId));
+    revalidatePath('/');
+    return notesCount;
 }

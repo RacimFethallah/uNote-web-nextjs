@@ -24,7 +24,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { addNewList, addNewNote, deleteList, fetchLists, fetchNotesFromList } from '@/app/actions';
+import { addNewList, addNewNote, deleteList, deleteNote, fetchLists, fetchNotesFromList } from '@/app/actions';
 
 
 import {
@@ -37,7 +37,6 @@ import ListForm from './listForm';
 import ListItem from './listItem';
 import React from 'react';
 import NoteForm from './noteForm';
-//import NoteForm from './noteForm';
 
 interface List {
     id: number;
@@ -79,63 +78,15 @@ export default function Aside({ lists }: { lists: List[] }) {
     };
 
 
-    // const toggleDrawer = () => {
-    //     setIsDrawerOpen(!isDrawerOpen);
-    // };
+    const handleDeleteNote = async (id: number) => {
+        if (selectedList) {
+            await deleteNote(id);
+            fetchNotesFromList(selectedList.id).then((notes) => {
+                setNotes(notes);
+            });
+        }
 
-
-
-    // const handleAddNewNote = () => {
-    //     if (newNoteInputValue.trim() !== '' && selectedList) {
-    //         const newNote: Note = {
-    //             id: Math.random().toString(36).substring(7),
-    //             title: newNoteInputValue.trim(),
-    //             content: '',
-    //             createdAt: new Date(),
-    //             updatedAt: new Date()
-    //         };
-    //         const updatedLists = lists.map((list) =>
-    //             list.id === selectedList.id
-    //                 ? { ...list, notes: [...list.notes, newNote] }
-    //                 : list
-    //         );
-    //         handleNoteClick(newNote);
-    //         setLists(updatedLists);
-    //         setNewNoteInputValue('');
-    //         setSelectedList(prevList => {
-    //             if (prevList) {
-    //                 return {
-    //                     ...prevList,
-    //                     notes: [...prevList.notes, newNote]
-    //                 };
-    //             }
-    //             return null;
-    //         });
-    //     }
-    // };
-
-
-    // const handleNewNoteInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setNewNoteInputValue(e.target.value);
-    // };
-
-
-
-    // useEffect(() => {
-    //     const favoritesList: List = {
-    //         id: "1",
-    //         name: "Favoris",
-    //         notes: []
-    //     };
-    //     const mesNotesList: List = {
-    //         id: "2",
-    //         name: "Mes Notes",
-    //         notes: []
-    //     };
-
-    //     // Set the lists state with predefined lists
-    //     setLists([favoritesList, mesNotesList]);
-    // }, []);
+    }
 
     return (
         <ResizablePanel className='' defaultSize={40} maxSize={40} minSize={40}>
@@ -144,7 +95,6 @@ export default function Aside({ lists }: { lists: List[] }) {
                     <ResizablePanel minSize={10} defaultSize={45} maxSize={45} collapsedSize={10} className='shadow-xl'>
                         <section className={` bg-[#f7f7f9]  p-3 flex flex-col transition-all duration-300 ease-in-out   h-screen `}>
                             <div className={`flex justify-end text-2xl text-gray-500 hover:text-gray-700 transition-colors duration-300 cursor-pointer`}>
-                                {/* {isDrawerOpen ? <CgPushChevronLeft /> : <CgPushChevronRight />} */}
                             </div>
                             <div className="text-xl font-bold p-2 flex justify-between items-center">
                                 <div className="flex justify-center items-center">
@@ -175,7 +125,10 @@ export default function Aside({ lists }: { lists: List[] }) {
                                         <hr />
                                         {lists.filter(list => list.name !== 'Favoris' && list.name !== 'Mes Notes').map((list, index) => (
                                             <React.Fragment key={index}>
-                                                <ListItem {...list} onClick={() => handleListItemClick(list)} />
+                                                <ListItem
+                                                    {...list}
+                                                    onClick={() => handleListItemClick(list)}
+                                                    notes={notes.filter((note) => note.listId === list.id).length} />
                                             </React.Fragment>
                                         ))}
                                     </ul>
@@ -186,7 +139,68 @@ export default function Aside({ lists }: { lists: List[] }) {
                                 <Switch className='mb-2 mt-2' />
                             </div>
 
-                            {/* {isDrawerOpen ? (
+
+
+
+                        </section>
+                    </ResizablePanel>
+                    <ResizableHandle />
+                    <ResizablePanel defaultSize={40} className=''>
+                        <section className="p-4 h-screen flex flex-col">
+                            <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
+                                {selectedList?.name || ''}
+                            </h2>
+                            <NoteForm onSubmit={handleNewNoteSubmit} />
+                            {selectedList && (
+                                <ScrollArea className="flex-1 ">
+                                    <ul className='space-y-3 pt-3'>
+                                        {notes.slice().reverse().map(note => (
+                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300`}
+                                                style={{ overflow: 'hidden' }}>
+                                                <CardHeader className=''>
+                                                    <div className='flex flex-row text-sm'>
+                                                        {new Intl.DateTimeFormat('fr', { month: 'short', day: 'numeric' }).format(note.createdAt)}
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
+                                                            <DropdownMenuContent>
+                                                                <DropdownMenuItem className='cursor-pointer'>
+                                                                    <div className='flex flex-row text-red-500 items-center gap-5'
+
+                                                                        onClick={() => handleDeleteNote(note.id)}>
+                                                                        <FaTrash /> Delete
+                                                                    </div> </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+
+                                                    <CardTitle className=' overflow-hidden whitespace-nowrap text-ellipsis w-60 text-lg'>
+                                                        {note.title}
+                                                    </CardTitle>
+                                                    <CardDescription className=' overflow-hidden whitespace-nowrap text-ellipsis w-60'>
+                                                        {note.content}
+                                                    </CardDescription>
+                                                </CardHeader>
+                                            </Card>
+                                        ))}
+                                    </ul>
+                                </ScrollArea>
+                            )}
+                        </section>
+                    </ResizablePanel>
+                </aside>
+            </ResizablePanelGroup>
+
+        </ResizablePanel>
+    );
+}
+
+
+
+
+
+
+
+{/* {isDrawerOpen ? (
                                 <>
                                     <div className="text-xl font-bold p-2 flex justify-between items-center">
                                         <div className="flex justify-center items-center">
@@ -276,60 +290,3 @@ export default function Aside({ lists }: { lists: List[] }) {
                                     </ul>
                                 </nav>
                             )} */}
-
-
-                        </section>
-                    </ResizablePanel>
-                    <ResizableHandle />
-                    <ResizablePanel defaultSize={40} className=''>
-                        <section className="p-4 h-screen flex flex-col">
-                            <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
-                                {selectedList?.name || ''}
-                            </h2>
-                            <NoteForm onSubmit={handleNewNoteSubmit} />
-                            {selectedList && (
-                                <ScrollArea className="flex-1 ">
-                                    <ul className='space-y-3 pt-3'>
-                                        {notes.slice().reverse().map(note => (
-                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300`}
-                                                style={{ overflow: 'hidden' }}>
-                                                <CardHeader className=''>
-                                                    <div className='flex flex-row text-sm'>
-                                                        {new Intl.DateTimeFormat('fr', { month: 'short', day: 'numeric' }).format(note.createdAt)}
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
-                                                            <DropdownMenuContent>
-                                                                <DropdownMenuItem className='cursor-pointer'>
-                                                                    <div className='flex flex-row text-red-500 items-center gap-5'>
-                                                                        <FaTrash /> Delete
-                                                                    </div> </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </div>
-
-                                                    <CardTitle className=' overflow-hidden whitespace-nowrap text-ellipsis w-60 text-lg'>
-                                                        {note.title}
-                                                    </CardTitle>
-                                                    <CardDescription className=' overflow-hidden whitespace-nowrap text-ellipsis w-60'>
-                                                        {note.content}
-                                                    </CardDescription>
-                                                </CardHeader>
-                                            </Card>
-                                        ))}
-                                    </ul>
-                                </ScrollArea>
-                            )}
-                        </section>
-                    </ResizablePanel>
-                </aside>
-            </ResizablePanelGroup>
-
-        </ResizablePanel>
-    );
-}
-
-
-
-
-
-
