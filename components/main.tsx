@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { ResizablePanel } from './ui/resizable';
-import { updateNote } from '@/app/actions';
+import { addToFavorite, updateNote } from '@/app/actions';
 import { time } from 'console';
+import { CiStar } from 'react-icons/ci';
 
 const Editor = dynamic(() => import('@/components/editor'), { ssr: false });
 
@@ -24,7 +25,7 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
             const parser = new DOMParser();
             const decodedContent = (parser.parseFromString(content, 'text/html').documentElement.textContent ?? '').trim();
             selectedNote.content = decodedContent;
-            setTimeout(() => { setIsNoteModified(true); }, 5000 );
+            setTimeout(() => { setIsNoteModified(true); }, 5000);
         }
     };
 
@@ -35,6 +36,11 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
             setIsNoteModified(false);
         }
     }, [selectedNote, isNoteModified, updateNote]);
+
+    const setFavorite = async (id: number) =>  {
+        await addToFavorite(id);
+        
+    }
 
     return (
         <ResizablePanel defaultSize={60} className="">
@@ -56,20 +62,25 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
                                 });
                             })()}
                         </p>
-                        <p className="text-sm">
-                            Date de modification:{' '}
-                            {(() => {
-                                const updatedAtDate = new Date(selectedNote.updatedAt);
-                                return updatedAtDate.toLocaleString('default', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                    hour: 'numeric',
-                                    minute: 'numeric',
-                                    hour12: false,
-                                });
-                            })()}
-                        </p>
+                        <div className='flex flex-row items-center'>
+                            <p className="text-sm">
+                                Date de modification:{' '}
+                                {(() => {
+                                    const updatedAtDate = new Date(selectedNote.updatedAt);
+                                    return updatedAtDate.toLocaleString('default', {
+                                        month: 'long',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: false,
+                                    });
+                                })()}
+                            </p>
+                            <span className='ml-auto cursor-pointer' onClick={() => setFavorite(selectedNote.id)}><CiStar size={24} /> </span>
+
+                        </div>
+
                         <div className="py-5">
                             <Editor note={selectedNote} onChange={handleEditorChange} />
                         </div>

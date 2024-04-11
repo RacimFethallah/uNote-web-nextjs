@@ -10,22 +10,26 @@ import { revalidatePath } from "next/cache";
 export const setupDefaultLists = async () => {
     try {
         const defaultLists = [
-            { name: 'Favoris' },
-            { name: 'Mes Notes' },
+            { id: 0, name: 'Favoris' },
+            { id: 1, name: 'Mes Notes' },
         ];
 
 
         const existingLists = await db
             .select()
             .from(lists)
-            .where(or(...defaultLists.map((list) => eq(lists.name, list.name))));
+            .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
 
+        const alllists = await db.select().from(lists).all();
+
+        console.log('All lists' , alllists);
         console.log('Existing lists:', existingLists);
 
         const missingLists = defaultLists.filter(
             (list) => !existingLists.some((existingList) => existingList.name === list.name)
         );
 
+        
         console.log('Missing lists:', missingLists);
 
         if (missingLists.length > 0) {
@@ -157,4 +161,20 @@ export async function updateNote(noteId: number, content: string, updatedAt: str
         console.error('Error updating note:', error);
         throw error;
     }
+}
+
+
+export async function addToFavorite(noteId: number){
+    try {
+        await db
+            .update(notes)
+            .set({ listId: 0 })
+            .where(eq(notes.id, noteId));
+
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Error updating note:', error);
+        throw error;
+    }
+
 }
