@@ -7,6 +7,7 @@ import { FaTrash } from "react-icons/fa";
 import { deleteList, getNotesCountForList } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface List {
     id: number;
@@ -18,7 +19,7 @@ interface ListItemProps {
     name: string;
     onClick: () => void;
     notes: number;
-    selectedList: List | null;
+    selectedList: string | null;
 }
 
 export default function ListItem({ id, name, onClick, notes, selectedList }: ListItemProps) {
@@ -31,8 +32,10 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
     };
 
     return (
-        <li
-            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList?.id === id ? 'bg-white' : ''}`}
+        <Link
+            href={`?list=${name}`}
+            // href={`/list/${id}`}
+            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList === name ? 'bg-white' : ''}`}
             onClick={() => handleClick()}
         >
             <CiViewList size={24} />
@@ -62,6 +65,6 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </li>
+        </Link>
     );
 }

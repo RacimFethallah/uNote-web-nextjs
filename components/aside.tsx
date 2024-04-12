@@ -37,6 +37,8 @@ import ListForm from './listForm';
 import ListItem from './listItem';
 import React from 'react';
 import NoteForm from './noteForm';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface List {
     id: number;
@@ -54,25 +56,35 @@ interface Note {
 
 export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: { lists: List[], Notes: Note[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
 
-    const [selectedList, setSelectedList] = useState<List | null>(null);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const selectedList = searchParams.get("list") ?? "Mes Notes";
+    if (selectedList === 'Mes Notes') {
+        // Set the search parameters to "Mes Notes" if that's the selected list
+        router.replace("?list=Mes Notes")
+      }
+    console.log(selectedList);
+
+
+    // const [selectedList, setSelectedList] = useState<List | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
 
-    useEffect(() => {
-        const setup = async () => {
-            await setupDefaultLists();
-            setTimeout(() => { setSelectedList(lists.find(list => list.id === 1) || null); }, 10);
-        };
-        setup();
-    }, []);
+    // useEffect(() => {
+    //     const setup = async () => {
+    //         await setupDefaultLists();
+    //         setTimeout(() => { setSelectedList(lists.find(list => list.id === 1) || null); }, 10);
+    //     };
+    //     setup();
+    // }, []);
 
 
 
-    const handleNoteClick = (note: Note) => {
-        setSelectedNote(note);
-    };
+    // const handleNoteClick = (note: Note) => {
+    //     setSelectedNote(note);
+    // };
 
     const handleListItemClick = async (list: List) => {
-        setSelectedList(list);
+        // setSelectedList(list);
 
         fetchNotesFromList(list.id).then((notes) => {
             setNotes(notes);
@@ -82,26 +94,26 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
     };
 
 
-    const handleNewNoteSubmit = async (noteTitle: string) => {
-        if (selectedList && selectedList.id != -1) {
-            const insertedNote = await addNewNote(noteTitle, selectedList.id);
-            handleNoteClick(insertedNote[0]);
-            fetchNotesFromList(selectedList.id).then((notes) => {
-                setNotes(notes);
-            });
-        }
-    };
+    // const handleNewNoteSubmit = async (noteTitle: string) => {
+    //     if (selectedList && selectedList.id != -1) {
+    //         const insertedNote = await addNewNote(noteTitle, selectedList.id);
+    //         handleNoteClick(insertedNote[0]);
+    //         fetchNotesFromList(selectedList.id).then((notes) => {
+    //             setNotes(notes);
+    //         });
+    //     }
+    // };
 
 
-    const handleDeleteNote = async (id: number) => {
-        if (selectedList) {
-            await deleteNote(id);
-            fetchNotesFromList(selectedList.id).then((notes) => {
-                setNotes(notes);
-            });
-        }
+    // const handleDeleteNote = async (id: number) => {
+    //     if (selectedList) {
+    //         await deleteNote(id);
+    //         fetchNotesFromList(selectedList.id).then((notes) => {
+    //             setNotes(notes);
+    //         });
+    //     }
 
-    }
+    // }
 
     const getNoteCount = (listName: string) => {
         const list = lists.find((l) => l.name === listName);
@@ -131,7 +143,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                             <ScrollArea className="flex-1 overflow-y-auto">
                                 <nav className="p-2 text-base">
                                     <ul className='space-y-2'>
-                                        <li
+                                        {/* <li
                                             className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Favoris' ? 'bg-white' : ''}`}
                                             onClick={() => handleListItemClick(lists.find((list) => list.name === 'Favoris') as List)}
                                         >
@@ -148,7 +160,27 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                             {getNoteCount('Mes Notes') > 0 && (
                                                 <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Mes Notes')}</span>
                                             )}
-                                        </li>
+                                        </li> */}
+                                        <Link
+                                            href={`?list=Favoris`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList === 'Favoris' ? 'bg-white' : ''}`}
+
+                                        >
+                                            <CiStar size={24} /> Favoris
+                                            {getNoteCount('Favoris') > 0 && (
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Favoris')}</span>
+                                            )}
+                                        </Link>
+                                        <Link
+                                        href={`?list=Mes Notes`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList === 'Mes Notes' ? 'bg-white' : ''}`}
+
+                                        >
+                                            <CiStickyNote size={24} /> Mes notes
+                                            {getNoteCount('Mes Notes') > 0 && (
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Mes Notes')}</span>
+                                            )}
+                                        </Link>
                                         <hr />
                                         {lists.filter(list => list.name !== 'Favoris' && list.name !== 'Mes Notes').map((list, index) => (
                                             <React.Fragment key={index}>
@@ -176,9 +208,9 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                     <ResizablePanel defaultSize={40} className=''>
                         <section className="pl-4 pt-4 h-screen flex flex-col">
                             <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
-                                {selectedList?.name || ''}
+                                {selectedList || ''}
                             </h2>
-                            <NoteForm onSubmit={handleNewNoteSubmit} />
+                            {/* <NoteForm onSubmit={handleNewNoteSubmit} />
                             {selectedList && (
                                 <ScrollArea className="flex-1 pr-4">
                                     <ul className='space-y-3 pt-3'>
@@ -218,7 +250,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                         ))}
                                     </ul>
                                 </ScrollArea>
-                            )}
+                            )} */}
                         </section>
                     </ResizablePanel>
                 </aside>

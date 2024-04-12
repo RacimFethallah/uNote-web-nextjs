@@ -9,15 +9,15 @@ import { revalidatePath } from "next/cache";
 
 export const deleteEverything = async () => {
     try {
-      await db.delete(notes);
-      await db.delete(lists);
-      const remainingLists = await db.select().from(lists);
-      console.log('Everything deleted');
-      console.log('Remaining lists:', remainingLists);
+        await db.delete(notes);
+        await db.delete(lists);
+        const remainingLists = await db.select().from(lists);
+        console.log('Everything deleted');
+        console.log('Remaining lists:', remainingLists);
     } catch (error) {
-      console.error('Error deleting everything:', error);
+        console.error('Error deleting everything:', error);
     }
-  };
+};
 
 export const setupDefaultLists = async () => {
     try {
@@ -34,7 +34,7 @@ export const setupDefaultLists = async () => {
 
         const alllists = await db.select().from(lists);
 
-        console.log('All lists' , alllists);
+        console.log('All lists', alllists);
         console.log('Existing lists:', existingLists);
 
         const missingLists = defaultLists.filter(
@@ -72,7 +72,7 @@ export async function addNewList(listName: string) {
 
 export async function addNewNote(noteTitle: string, listId: number) {
     try {
-        const insertedNote =await db
+        const insertedNote = await db
             .insert(notes)
             .values({ title: noteTitle.trim(), listId: listId, content: '' }).returning();
 
@@ -119,9 +119,7 @@ export async function fetchLists() {
     try {
         const Lists = await db
             .select()
-            .from(lists)
-            // .orderBy(lists.name.asc)
-            .all();
+            .from(lists);
         return Lists;
     } catch (error) {
         console.error('Error fetching lists:', error);
@@ -178,7 +176,7 @@ export async function updateNote(noteId: number, content: string, updatedAt: str
 }
 
 
-export async function addToFavorite(noteId: number){
+export async function addToFavorite(noteId: number) {
     try {
         await db
             .update(notes)
@@ -195,7 +193,7 @@ export async function addToFavorite(noteId: number){
 
 
 
-export async function removeFromFavorite(noteId: number){
+export async function removeFromFavorite(noteId: number) {
     try {
         await db
             .update(notes)
