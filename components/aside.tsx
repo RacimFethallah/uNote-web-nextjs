@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import { useState, useEffect, useRef, use } from 'react';
 import { AiOutlineUser } from "react-icons/ai";
 import { CgPushChevronLeft, CgPushChevronRight } from "react-icons/cg";
@@ -63,19 +63,20 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
 
     const searchParams = useSearchParams();
     const router = useRouter();
-    let selectedList: SelectedList = {
+    const selectedList: SelectedList = {
         id: searchParams.get('listId') ?? '1',
         name: searchParams.get('listName') ?? 'Mes Notes',
     };
 
-    if (selectedList.name === 'Mes Notes') {
-        // Set the search parameters to "Mes Notes" if that's the selected list
-        router.replace('?listId=1&listName=Mes Notes');
-    }
+    // console.log(selectedList);
+
+    // if (selectedList.name === 'Mes Notes') {
+    //     router.replace('?listId=1&listName=Mes Notes');
+    // }
 
 
     // const [selectedList, setSelectedList] = useState<List | null>(null);
-    const [notes, setNotes] = useState<Note[]>([]);
+    // const [notes, setNotes] = useState<Note[]>([]);
 
     // useEffect(() => {
     //     const setup = async () => {
@@ -95,7 +96,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
         // setSelectedList(list);
 
         fetchNotesFromList(list.id).then((notes) => {
-            setNotes(notes);
+            // setNotes(notes);
             console.log(notes);
         });
 
@@ -108,7 +109,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                 const insertedNote = await addNewNote(noteTitle, parseInt(selectedList.id));
                 handleNoteClick(insertedNote[0]);
                 fetchNotesFromList(parseInt(selectedList.id)).then((notes) => {
-                    setNotes(notes);
+                    // setNotes(notes);
                 });
             }
         };
@@ -119,7 +120,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
         if (selectedList) {
             await deleteNote(id);
             fetchNotesFromList(parseInt(selectedList.id)).then((notes) => {
-                setNotes(notes);
+                // setNotes(notes);
             });
         }
 
@@ -232,9 +233,9 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                                     <div className='flex flex-row text-sm'>
                                                         {(() => {
                                                             const createdAtDate = new Date(note.createdAt);
-                                                            const shortMonth = createdAtDate.toLocaleString('default', { month: 'short' });
-                                                            const dayNumber = createdAtDate.getDate();
-                                                            return `${shortMonth} ${dayNumber}`;
+                                                            const options = { month: 'short' };
+                                                            const formattedDate = createdAtDate.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
+                                                            return formattedDate;
                                                         })()}
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
