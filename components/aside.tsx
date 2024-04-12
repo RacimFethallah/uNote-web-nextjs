@@ -54,16 +54,24 @@ interface Note {
     updatedAt: string;
 }
 
+interface SelectedList {
+    id: string;
+    name: string;
+}
+
 export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: { lists: List[], Notes: Note[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
 
     const searchParams = useSearchParams();
     const router = useRouter();
-    const selectedList = searchParams.get("list") ?? "Mes Notes";
-    if (selectedList === 'Mes Notes') {
+    let selectedList: SelectedList = {
+        id: searchParams.get('listId') ?? '1',
+        name: searchParams.get('listName') ?? 'Mes Notes',
+    };
+
+    if (selectedList.name === 'Mes Notes') {
         // Set the search parameters to "Mes Notes" if that's the selected list
-        router.replace("?list=Mes Notes")
-      }
-    console.log(selectedList);
+        router.replace('?listId=1&listName=Mes Notes');
+    }
 
 
     // const [selectedList, setSelectedList] = useState<List | null>(null);
@@ -79,9 +87,9 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
 
 
 
-    // const handleNoteClick = (note: Note) => {
-    //     setSelectedNote(note);
-    // };
+    const handleNoteClick = (note: Note) => {
+        setSelectedNote(note);
+    };
 
     const handleListItemClick = async (list: List) => {
         // setSelectedList(list);
@@ -94,26 +102,28 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
     };
 
 
-    // const handleNewNoteSubmit = async (noteTitle: string) => {
-    //     if (selectedList && selectedList.id != -1) {
-    //         const insertedNote = await addNewNote(noteTitle, selectedList.id);
-    //         handleNoteClick(insertedNote[0]);
-    //         fetchNotesFromList(selectedList.id).then((notes) => {
-    //             setNotes(notes);
-    //         });
-    //     }
-    // };
+    const handleNewNoteSubmit = async (noteTitle: string) => {
+        if (selectedList && parseInt(selectedList.id) != -1) {
+            if (selectedList) {
+                const insertedNote = await addNewNote(noteTitle, parseInt(selectedList.id));
+                handleNoteClick(insertedNote[0]);
+                fetchNotesFromList(parseInt(selectedList.id)).then((notes) => {
+                    setNotes(notes);
+                });
+            }
+        };
+    }
 
 
-    // const handleDeleteNote = async (id: number) => {
-    //     if (selectedList) {
-    //         await deleteNote(id);
-    //         fetchNotesFromList(selectedList.id).then((notes) => {
-    //             setNotes(notes);
-    //         });
-    //     }
+    const handleDeleteNote = async (id: number) => {
+        if (selectedList) {
+            await deleteNote(id);
+            fetchNotesFromList(parseInt(selectedList.id)).then((notes) => {
+                setNotes(notes);
+            });
+        }
 
-    // }
+    }
 
     const getNoteCount = (listName: string) => {
         const list = lists.find((l) => l.name === listName);
@@ -162,8 +172,8 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                             )}
                                         </li> */}
                                         <Link
-                                            href={`?list=Favoris`}
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList === 'Favoris' ? 'bg-white' : ''}`}
+                                            href={`?listId=0&listName=Favoris`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Favoris' ? 'bg-white' : ''}`}
 
                                         >
                                             <CiStar size={24} /> Favoris
@@ -172,8 +182,8 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                             )}
                                         </Link>
                                         <Link
-                                        href={`?list=Mes Notes`}
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList === 'Mes Notes' ? 'bg-white' : ''}`}
+                                            href={`?listId=1&listName=Mes Notes`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Mes Notes' ? 'bg-white' : ''}`}
 
                                         >
                                             <CiStickyNote size={24} /> Mes notes
@@ -208,13 +218,13 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                     <ResizablePanel defaultSize={40} className=''>
                         <section className="pl-4 pt-4 h-screen flex flex-col">
                             <h2 className="text-2xl font-bold mb-4 overflow-hidden whitespace-nowrap text-ellipsis ">
-                                {selectedList || ''}
+                                {selectedList.name || ''}
                             </h2>
-                            {/* <NoteForm onSubmit={handleNewNoteSubmit} />
+                            <NoteForm onSubmit={handleNewNoteSubmit} />
                             {selectedList && (
                                 <ScrollArea className="flex-1 pr-4">
                                     <ul className='space-y-3 pt-3'>
-                                        {Notes.filter(note => note.listId === selectedList.id).slice().reverse().map(note => (
+                                        {Notes.filter(note => note.listId === parseInt(selectedList.id)).slice().reverse().map(note => (
                                             <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote?.id === note.id ? 'bg-slate-50 border-black' : 'bg-white'}`}
                                                 style={{ overflow: 'hidden' }}
                                                 onClick={() => handleNoteClick(note)}>
@@ -250,7 +260,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                         ))}
                                     </ul>
                                 </ScrollArea>
-                            )} */}
+                            )}
                         </section>
                     </ResizablePanel>
                 </aside>

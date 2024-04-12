@@ -14,12 +14,17 @@ interface List {
     name: string;
 }
 
+interface SelectedList {
+    id: string;
+    name: string;
+}
+
 interface ListItemProps {
     id: number;
     name: string;
     onClick: () => void;
     notes: number;
-    selectedList: string | null;
+    selectedList: SelectedList | null;
 }
 
 export default function ListItem({ id, name, onClick, notes, selectedList }: ListItemProps) {
@@ -33,9 +38,10 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
 
     return (
         <Link
-            href={`?list=${name}`}
+            href={`?listId=${id}&listName=${name}`}
+            // href={`?list=${name}`}
             // href={`/list/${id}`}
-            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList === name ? 'bg-white' : ''}`}
+            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList?.name === name ? 'bg-white' : ''}`}
             onClick={() => handleClick()}
         >
             <CiViewList size={24} />
