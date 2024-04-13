@@ -1,6 +1,6 @@
 // const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
-"use client";
+// "use client";
 // import { useState } from "react";
 import Aside from "./aside";
 import Main from "./main";

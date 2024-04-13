@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 import { useState, useEffect, useRef, use } from 'react';
 import { AiOutlineUser } from "react-icons/ai";
 import { CgPushChevronLeft, CgPushChevronRight } from "react-icons/cg";
