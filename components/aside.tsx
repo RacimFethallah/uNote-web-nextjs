@@ -59,7 +59,7 @@ interface SelectedList {
     name: string;
 }
 
-export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: { lists: List[], Notes: Note[], selectedNote: Note | null, setSelectedNote: (note: Note | null) => void }) {
+export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]}) {
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -67,6 +67,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
         id: searchParams.get('listId') ?? '1',
         name: searchParams.get('listName') ?? 'Mes Notes',
     };
+    const selectedNote = searchParams.get('noteId');
 
     // console.log(selectedList);
 
@@ -88,9 +89,9 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
 
 
 
-    const handleNoteClick = (note: Note) => {
-        setSelectedNote(note);
-    };
+    // const handleNoteClick = (note: Note) => {
+    //     setSelectedNote(note);
+    // };
 
     const handleListItemClick = async (list: List) => {
         // setSelectedList(list);
@@ -107,7 +108,7 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
         if (selectedList && parseInt(selectedList.id) != -1) {
             if (selectedList) {
                 const insertedNote = await addNewNote(noteTitle, parseInt(selectedList.id));
-                handleNoteClick(insertedNote[0]);
+                // handleNoteClick(insertedNote[0]);
                 fetchNotesFromList(parseInt(selectedList.id)).then((notes) => {
                     // setNotes(notes);
                 });
@@ -226,38 +227,45 @@ export default function Aside({ lists, Notes, selectedNote, setSelectedNote }: {
                                 <ScrollArea className="flex-1 pr-4">
                                     <ul className='space-y-3 pt-3'>
                                         {Notes.filter(note => note.listId === parseInt(selectedList.id)).slice().reverse().map(note => (
-                                            <Card key={note.id} className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote?.id === note.id ? 'bg-slate-50 border-black' : 'bg-white'}`}
-                                                style={{ overflow: 'hidden' }}
-                                                onClick={() => handleNoteClick(note)}>
-                                                <CardHeader className=''>
-                                                    <div className='flex flex-row text-sm'>
-                                                        {(() => {
-                                                            const createdAtDate = new Date(note.createdAt);
-                                                            const options = { month: 'short' };
-                                                            const formattedDate = createdAtDate.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
-                                                            return formattedDate;
-                                                        })()}
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
-                                                            <DropdownMenuContent>
-                                                                <DropdownMenuItem className='cursor-pointer'>
-                                                                    <div className='flex flex-row text-red-500 items-center gap-5'
+                                            <Link
+                                                href={`?listId=${selectedList.id}&listName=${selectedList.name}&noteId=${note.id}`}>
+                                                <Card
+                                                    key={note.id}
+                                                    className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${
+                                                        selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
+                                                    }`}
+                                                    style={{ overflow: 'hidden' }}
+                                                >
+                                                    <CardHeader className=''>
+                                                        <div className='flex flex-row text-sm'>
+                                                            {(() => {
+                                                                const createdAtDate = new Date(note.createdAt);
+                                                                const options = { month: 'short' };
+                                                                const formattedDate = createdAtDate.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
+                                                                return formattedDate;
+                                                            })()}
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger className='ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'><BsThreeDots size={20} /></DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuItem className='cursor-pointer'>
+                                                                        <div className='flex flex-row text-red-500 items-center gap-5'
 
-                                                                        onClick={() => handleDeleteNote(note.id)}>
-                                                                        <FaTrash /> Delete
-                                                                    </div> </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </div>
+                                                                            onClick={() => handleDeleteNote(note.id)}>
+                                                                            <FaTrash /> Delete
+                                                                        </div> </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
 
-                                                    <CardTitle className=' overflow-hidden whitespace-nowrap text-ellipsis w-60 text-lg'>
-                                                        {note.title}
-                                                    </CardTitle>
-                                                    <CardDescription className=' overflow-hidden whitespace-nowrap text-ellipsis w-60'>
-                                                        {note.content}
-                                                    </CardDescription>
-                                                </CardHeader>
-                                            </Card>
+                                                        <CardTitle className=' overflow-hidden whitespace-nowrap text-ellipsis w-60 text-lg'>
+                                                            {note.title}
+                                                        </CardTitle>
+                                                        <CardDescription className=' overflow-hidden whitespace-nowrap text-ellipsis w-60'>
+                                                            {note.content}
+                                                        </CardDescription>
+                                                    </CardHeader>
+                                                </Card>
+                                            </Link>
                                         ))}
                                     </ul>
                                 </ScrollArea>

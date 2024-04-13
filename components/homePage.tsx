@@ -1,7 +1,7 @@
 // const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
 "use client";
-import { useState } from "react";
+// import { useState } from "react";
 import Aside from "./aside";
 import Main from "./main";
 import { ResizableHandle, ResizablePanelGroup } from "./ui/resizable";
@@ -25,13 +25,13 @@ interface Note {
 
 
 export default function HomePage({ lists, notes }: { lists: List[], notes: Note[] }) {
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  // const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
 
   return <ResizablePanelGroup direction="horizontal">
-    <Aside lists={lists} Notes={notes} selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
+    <Aside lists={lists} Notes={notes} />
     <ResizableHandle disabled={true} />
-    <Main selectedNote={selectedNote} />
+    <Main notes={notes} />
   </ResizablePanelGroup>;
 }
 

@@ -6,6 +6,7 @@ import { addToFavorite, removeFromFavorite, updateNote } from '@/app/actions';
 import { time } from 'console';
 import { CiStar } from 'react-icons/ci';
 import { GoStarFill, GoStar } from "react-icons/go";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Editor = dynamic(() => import('@/components/editor'), { ssr: false });
 
@@ -18,7 +19,12 @@ interface Note {
     updatedAt: string;
 }
 
-export default function Main({ selectedNote }: { selectedNote: Note | null }) {
+export default function Main({notes} : {notes : Note[]}) {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    const selectedNoteId = searchParams.get('noteId');
+    const selectedNote = selectedNoteId ? notes.find((note) => note.id === parseInt(selectedNoteId)) : null;
     const [isNoteModified, setIsNoteModified] = useState(false);
 
     const handleEditorChange = (content: string) => {
@@ -57,7 +63,7 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
                             Date de création:{' '}
                             {(() => {
                                 const createdAtDate = new Date(selectedNote.createdAt);
-                                return createdAtDate.toLocaleString('default', {
+                                return createdAtDate.toLocaleString('fr-FR', {
                                     month: 'long',
                                     day: 'numeric',
                                     year: 'numeric',
@@ -72,7 +78,7 @@ export default function Main({ selectedNote }: { selectedNote: Note | null }) {
                                 Date de modification:{' '}
                                 {(() => {
                                     const updatedAtDate = new Date(selectedNote.updatedAt);
-                                    return updatedAtDate.toLocaleString('default', {
+                                    return updatedAtDate.toLocaleString('fr-FR', {
                                         month: 'long',
                                         day: 'numeric',
                                         year: 'numeric',
