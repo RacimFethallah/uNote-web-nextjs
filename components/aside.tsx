@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, use } from 'react';
 import { AiOutlineUser } from "react-icons/ai";
 import { CgPushChevronLeft, CgPushChevronRight } from "react-icons/cg";
-import { IoSettingsOutline, IoAddOutline } from "react-icons/io5";
+import { IoSettingsOutline, IoAddOutline, IoExitOutline } from "react-icons/io5";
 import { CiStar, CiStickyNote, CiViewList } from "react-icons/ci";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,8 +37,9 @@ import ListForm from './listForm';
 import ListItem from './listItem';
 import React from 'react';
 import NoteForm from './noteForm';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { redirect, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { logout } from '@/actions/auth';
 
 interface List {
     id: number;
@@ -59,7 +60,13 @@ interface SelectedList {
     name: string;
 }
 
-export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[] }) {
+interface User {
+    id: string;
+    username: string;
+    email: string;
+}
+
+export default function Aside({ lists, Notes, user }: { lists: List[], Notes: Note[], user: User}) {
     console.log(lists)
 
 
@@ -146,11 +153,27 @@ export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[] }
                                     <div className="rounded-full bg-gray-200 p-2 mr-4">
                                         <AiOutlineUser className="text-gray-700" />
                                     </div>
-                                    Utilisateur
+                                    {user.username ?? "utilisateur"}
                                 </div>
-                                <div className="text-gray-500 hover:text-gray-700 transition-colors duration-300 cursor-pointer">
-                                    <IoSettingsOutline />
-                                </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className="text-gray-500 hover:text-gray-700 transition-colors duration-300 cursor-pointer">
+                                        <BsThreeDots size={20} />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={async () => {
+                                            
+                                                await logout();
+                                                redirect('/');
+                                            }}
+                                        >
+                                            <div className="flex flex-row text-red-500 items-center gap-5">
+                                                <IoExitOutline /> Logout
+                                            </div>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
 
                             <ScrollArea className="flex-1 overflow-y-auto">

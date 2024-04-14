@@ -3,8 +3,9 @@
 import { db } from "@/db/db";
 import { lists, notes } from "@/db/schema";
 import { count, sql } from 'drizzle-orm';
-import { eq, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
+import { eq, and, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
+import { getSession } from "./auth";
 
 
 export const deleteEverything = async () => {
@@ -19,56 +20,56 @@ export const deleteEverything = async () => {
     }
 };
 
-//export const setupDefaultLists = async () => {
-//    try {
-//        const defaultLists = [
-//            { id: 0, name: 'Favoris' },
-//            { id: 1, name: 'Mes Notes' },
-//        ];
-//
-//
-//        const existingLists = await db
-//            .select()
-//            .from(lists)
-//            .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
-//
-//        const alllists = await db.select().from(lists);
-//
-//        console.log('All lists', alllists);
-//        console.log('Existing lists:', existingLists);
-//
-//        const missingLists = defaultLists.filter(
-//            (list) => !existingLists.some((existingList) => existingList.name === list.name)
-//        );
-//
-//
-//        console.log('Missing lists:', missingLists);
-//
-//        if (missingLists.length > 0) {
-//            await db.insert(lists).values(missingLists);
-//            console.log('Default lists created');
-//        }
-//
-//        revalidatePath('/home');
-//    } catch (error) {
-//        console.error('Error setting up default lists:', error);
-//    }
-//};
+export const setupDefaultLists = async () => {
+    const session = await getSession();
+    const userId = session.user[0].id;
+
+    try {
+        const defaultLists = [
+            { id: 0, name: 'Favoris', userId: userId },
+            { id: 1, name: 'Mes Notes', userId: userId },
+        ];
 
 
+        const existingLists = await db
+            .select()
+            .from(lists)
+            .where(or(...defaultLists.map((list) => and(eq(lists.id, list.id), eq(lists.userId, userId)))));
 
-//export async function addNewList(listName: string) {
-//    try {
-//        await db
-//            .insert(lists)
-//            .values({ name: listName.trim() });
-//
-//        revalidatePath('/home');
-//    } catch (error) {
-//        console.error('Error inserting new list:', error);
-//        throw error;
-//    }
-//};
+        const alllists = await db.select().from(lists).where(eq(lists.userId, userId));
+
+
+        const missingLists = defaultLists.filter(
+            (list) => !existingLists.some((existingList) => existingList.name === list.name)
+        );
+
+
+        console.log('Missing lists:', missingLists);
+
+        if (missingLists.length > 0) {
+            await db.insert(lists).values(missingLists);
+            console.log('Default lists created');
+        }
+
+        revalidatePath('/home');
+    } catch (error) {
+        console.error('Error setting up default lists:', error);
+    }
+}
+export async function addNewList(listName: string) {
+    const session = await getSession();
+    const userId = session.user[0].id;
+    try {
+        await db
+            .insert(lists)
+            .values({ name: listName.trim(), userId: userId });
+
+        revalidatePath('/home');
+    } catch (error) {
+        console.error('Error inserting new list:', error);
+        throw error;
+    }
+};
 
 export async function addNewNote(noteTitle: string, listId: number) {
     try {

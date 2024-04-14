@@ -10,10 +10,12 @@ import * as z from "zod";
 import { registerUser } from "@/actions/register";
 import { Toaster } from "./ui/sonner";
 import { toast } from "sonner";
+import { loginUser } from "@/actions/auth";
 export default function LandingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const method = searchParams.get("method") ?? "login";
+  
 
   return (
     <main className="flex items-center justify-center h-screen bg-slate-200">
@@ -24,6 +26,17 @@ export default function LandingPage() {
 
 const Login = () => {
   const router = useRouter();
+
+
+  const handleLogin = async (formData: FormData) => {
+    const response = await loginUser(formData);
+    if (response?.error) {
+      toast.error(response.message);
+    } else if (response) {
+      toast.success(response.message);
+      //router.replace('/home');
+    }
+  }
 
   return (
     <motion.div
@@ -38,15 +51,19 @@ const Login = () => {
           <CardDescription>Login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin(new FormData(e.currentTarget));
+          }}>
             <Label htmlFor="email">Email</Label>
-            <Input className="mb-5" id="email" placeholder="Email" type="email" />
+            <Input className="mb-5" id="email" name="email" placeholder="Email" type="email" />
             <Label htmlFor="password">Password</Label>
-            <Input id="password" placeholder="Password" type="password" />
+            <Input className="mb-5" id="password" name="password" placeholder="Password" type="password" />
+            <Button type="submit" className="w-full">Login</Button>
+
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-y-3 ">
-          <Button className="w-full">Login</Button>
           <Button variant="outline" className="w-full"><FcGoogle size={20} /></Button>
           <hr className="w-full" />
           <div className="text-sm">Don't have an account?</div>
@@ -70,6 +87,7 @@ const Register = () => {
       toast.error(response.message);
     } else if (response.success) {
       toast.success(response.message);
+      router.replace('/home');
     }
   };
 
