@@ -19,56 +19,56 @@ export const deleteEverything = async () => {
     }
 };
 
-export const setupDefaultLists = async () => {
-    try {
-        const defaultLists = [
-            { id: 0, name: 'Favoris' },
-            { id: 1, name: 'Mes Notes' },
-        ];
+//export const setupDefaultLists = async () => {
+//    try {
+//        const defaultLists = [
+//            { id: 0, name: 'Favoris' },
+//            { id: 1, name: 'Mes Notes' },
+//        ];
+//
+//
+//        const existingLists = await db
+//            .select()
+//            .from(lists)
+//            .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
+//
+//        const alllists = await db.select().from(lists);
+//
+//        console.log('All lists', alllists);
+//        console.log('Existing lists:', existingLists);
+//
+//        const missingLists = defaultLists.filter(
+//            (list) => !existingLists.some((existingList) => existingList.name === list.name)
+//        );
+//
+//
+//        console.log('Missing lists:', missingLists);
+//
+//        if (missingLists.length > 0) {
+//            await db.insert(lists).values(missingLists);
+//            console.log('Default lists created');
+//        }
+//
+//        revalidatePath('/home');
+//    } catch (error) {
+//        console.error('Error setting up default lists:', error);
+//    }
+//};
 
 
-        const existingLists = await db
-            .select()
-            .from(lists)
-            .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
 
-        const alllists = await db.select().from(lists);
-
-        console.log('All lists', alllists);
-        console.log('Existing lists:', existingLists);
-
-        const missingLists = defaultLists.filter(
-            (list) => !existingLists.some((existingList) => existingList.name === list.name)
-        );
-
-
-        console.log('Missing lists:', missingLists);
-
-        if (missingLists.length > 0) {
-            await db.insert(lists).values(missingLists);
-            console.log('Default lists created');
-        }
-
-        revalidatePath('/');
-    } catch (error) {
-        console.error('Error setting up default lists:', error);
-    }
-};
-
-
-
-export async function addNewList(listName: string) {
-    try {
-        await db
-            .insert(lists)
-            .values({ name: listName.trim() });
-
-        revalidatePath('/');
-    } catch (error) {
-        console.error('Error inserting new list:', error);
-        throw error;
-    }
-};
+//export async function addNewList(listName: string) {
+//    try {
+//        await db
+//            .insert(lists)
+//            .values({ name: listName.trim() });
+//
+//        revalidatePath('/home');
+//    } catch (error) {
+//        console.error('Error inserting new list:', error);
+//        throw error;
+//    }
+//};
 
 export async function addNewNote(noteTitle: string, listId: number) {
     try {
@@ -76,7 +76,7 @@ export async function addNewNote(noteTitle: string, listId: number) {
             .insert(notes)
             .values({ title: noteTitle.trim(), listId: listId, content: '' }).returning();
 
-        revalidatePath('/');
+        revalidatePath('/home');
         return insertedNote;
     } catch (error) {
         console.error('Error inserting new note:', error);
@@ -92,7 +92,7 @@ export async function deleteList(listId: number) {
             .where(eq(lists.id, listId));
 
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error deleting list:', error);
         throw error;
@@ -107,7 +107,7 @@ export async function deleteNote(noteId: number) {
             .delete(notes)
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error deleting note:', error);
         throw error;
@@ -155,7 +155,7 @@ export async function fetchNotes() {
 
 export async function getNotesCountForList(listId: number) {
     const notesCount = await db.select({ count: sql<number>`count(*)` }).from(notes).where(eq(notes.listId, listId));
-    revalidatePath('/');
+    revalidatePath('/home');
     return notesCount;
 }
 
@@ -168,7 +168,7 @@ export async function updateNote(noteId: number, content: string, updatedAt: str
             .set({ content: content, updatedAt: updatedAt })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;
@@ -183,7 +183,7 @@ export async function addToFavorite(noteId: number) {
             .set({ listId: 0 })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;
@@ -200,7 +200,7 @@ export async function removeFromFavorite(noteId: number) {
             .set({ listId: 1 })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;

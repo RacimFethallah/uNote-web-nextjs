@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Input } from "./ui/input";
-import { addNewList } from "@/app/actions";
+import { addNewList } from "@/actions/actions";
 
 
 

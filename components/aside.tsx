@@ -59,7 +59,9 @@ interface SelectedList {
     name: string;
 }
 
-export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]}) {
+export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[] }) {
+    console.log(lists)
+
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -79,13 +81,12 @@ export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]})
     // const [selectedList, setSelectedList] = useState<List | null>(null);
     // const [notes, setNotes] = useState<Note[]>([]);
 
-    // useEffect(() => {
-    //     const setup = async () => {
-    //         await setupDefaultLists();
-    //         setTimeout(() => { setSelectedList(lists.find(list => list.id === 1) || null); }, 10);
-    //     };
-    //     setup();
-    // }, []);
+    useEffect(() => {
+        const setup = async () => {
+            await setupDefaultLists();
+        };
+        setup();
+    }, []);
 
 
 
@@ -174,7 +175,7 @@ export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]})
                                             )}
                                         </li> */}
                                         <Link
-                                            href={`?listId=0&listName=Favoris`}
+                                            href={`home?listId=0&listName=Favoris`}
                                             className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Favoris' ? 'bg-white' : ''}`}
 
                                         >
@@ -184,7 +185,7 @@ export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]})
                                             )}
                                         </Link>
                                         <Link
-                                            href={`?listId=1&listName=Mes Notes`}
+                                            href={`home?listId=1&listName=Mes Notes`}
                                             className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Mes Notes' ? 'bg-white' : ''}`}
 
                                         >
@@ -228,12 +229,11 @@ export default function Aside({ lists, Notes }: { lists: List[], Notes: Note[]})
                                     <ul className='space-y-3 pt-3'>
                                         {Notes.filter(note => note.listId === parseInt(selectedList.id)).slice().reverse().map(note => (
                                             <Link
-                                                href={`?listId=${selectedList.id}&listName=${selectedList.name}&noteId=${note.id}`}>
+                                                href={`home?listId=${selectedList.id}&listName=${selectedList.name}&noteId=${note.id}`}>
                                                 <Card
                                                     key={note.id}
-                                                    className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${
-                                                        selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
-                                                    }`}
+                                                    className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
+                                                        }`}
                                                     style={{ overflow: 'hidden' }}
                                                 >
                                                     <CardHeader className=''>

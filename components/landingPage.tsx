@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import * as z from "zod";
+import { registerUser } from "@/actions/register";
 export default function LandingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -59,6 +60,8 @@ const Login = () => {
 const Register = () => {
   const router = useRouter();
 
+
+
   return (
     <motion.div
       initial={{ width: 350, height: 450 }}
@@ -71,17 +74,18 @@ const Register = () => {
           <CardDescription>Create an account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={registerUser}>
             <Label htmlFor="username">Username</Label>
-            <Input className="mb-5" id="username" placeholder="Username" />
+            <Input className="mb-5" id="username" name="username" placeholder="Username" />
             <Label htmlFor="email">Email</Label>
-            <Input className="mb-5" id="email" placeholder="Email" type="email" />
+            <Input className="mb-5" id="email" name="email" placeholder="Email" type="email" />
             <Label htmlFor="password">Password</Label>
-            <Input id="password" placeholder="Password" type="password" />
+            <Input className="mb-5" id="password" name="password" placeholder="Password" type="password" />
+            <Button type="submit" className="w-full">Register</Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-y-3 ">
-          <Button className="w-full">Register</Button>
+          
           <hr className="w-full" />
           <div className="text-sm">Already have an account?</div>
           <Button className="w-full" variant="outline" onClick={() => router.push('?method=login')}>

@@ -4,7 +4,7 @@ import { CiViewList } from "react-icons/ci";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { BsThreeDots } from "react-icons/bs";
 import { FaTrash } from "react-icons/fa";
-import { deleteList, getNotesCountForList } from "@/app/actions";
+import { deleteList, getNotesCountForList } from "@/actions/actions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -38,7 +38,7 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
 
     return (
         <Link
-            href={`?listId=${id}&listName=${name}`}
+            href={`home?listId=${id}&listName=${name}`}
             // href={`?list=${name}`}
             // href={`/list/${id}`}
             className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList?.name === name ? 'bg-white' : ''}`}

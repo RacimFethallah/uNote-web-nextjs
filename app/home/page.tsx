@@ -12,7 +12,9 @@ export default async function Home() {
 
   const lists = await fetchLists();
 
+
   const notes = await fetchNotes();
+
 
   return <ResizablePanelGroup direction="horizontal">
     <Aside lists={lists} Notes={notes} />
