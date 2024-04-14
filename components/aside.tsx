@@ -24,7 +24,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { addNewList, addNewNote, deleteList, deleteNote, fetchLists, fetchNotesFromList, setupDefaultLists } from '@/app/actions';
+import { addNewList, addNewNote, deleteList, deleteNote, fetchLists, fetchNotesFromList, setupDefaultLists } from '@/actions/actions';
 
 
 import {

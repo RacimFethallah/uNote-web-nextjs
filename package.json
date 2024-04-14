@@ -30,7 +30,8 @@
     "react-resizable": "^3.0.5",
     "react-resizable-panels": "^2.0.16",
     "tailwind-merge": "^2.2.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.12",

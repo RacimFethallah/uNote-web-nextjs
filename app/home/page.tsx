@@ -1,4 +1,4 @@
-import { fetchLists, fetchNotes } from "@/app/actions";
+import { fetchLists, fetchNotes } from "@/actions/actions";
 import Aside from "@/components/aside";
 import Main from "@/components/main";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable";

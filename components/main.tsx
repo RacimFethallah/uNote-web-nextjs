@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { ResizablePanel } from './ui/resizable';
-import { addToFavorite, removeFromFavorite, updateNote } from '@/app/actions';
+import { addToFavorite, removeFromFavorite, updateNote } from '@/actions/actions';
 import { time } from 'console';
 import { CiStar } from 'react-icons/ci';
 import { GoStarFill, GoStar } from "react-icons/go";
