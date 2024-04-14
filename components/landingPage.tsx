@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import * as z from "zod";
 import { registerUser } from "@/actions/register";
+import { Toaster } from "./ui/sonner";
+import { toast } from "sonner";
 export default function LandingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -62,6 +64,15 @@ const Register = () => {
 
 
 
+  const handleRegister = async (formData: FormData) => {
+    const response = await registerUser(formData);
+    if (response.error) {
+      toast.error(response.message);
+    } else if (response.success) {
+      toast.success(response.message);
+    }
+  };
+
   return (
     <motion.div
       initial={{ width: 350, height: 450 }}
@@ -74,7 +85,10 @@ const Register = () => {
           <CardDescription>Create an account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={registerUser}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            handleRegister(new FormData(e.currentTarget));
+          }}>
             <Label htmlFor="username">Username</Label>
             <Input className="mb-5" id="username" name="username" placeholder="Username" />
             <Label htmlFor="email">Email</Label>
@@ -85,7 +99,7 @@ const Register = () => {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-y-3 ">
-          
+
           <hr className="w-full" />
           <div className="text-sm">Already have an account?</div>
           <Button className="w-full" variant="outline" onClick={() => router.push('?method=login')}>
@@ -93,6 +107,8 @@ const Register = () => {
           </Button>
         </CardFooter>
       </Card>
+      <Toaster richColors />
+
     </motion.div>
   );
 };

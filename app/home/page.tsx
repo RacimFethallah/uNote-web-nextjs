@@ -1,4 +1,5 @@
 import { fetchLists, fetchNotes } from "@/actions/actions";
+import { auth } from "@/actions/auth";
 import Aside from "@/components/aside";
 import Main from "@/components/main";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -8,6 +9,8 @@ import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable"
 
 
 export default async function Home() {
+
+  const session = await auth();
 
 
   const lists = await fetchLists();
