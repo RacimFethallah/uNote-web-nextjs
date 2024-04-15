@@ -117,10 +117,13 @@ export async function deleteNote(noteId: number) {
 
 
 export async function fetchLists() {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         const Lists = await db
             .select()
-            .from(lists);
+            .from(lists)
+            .where(eq(lists.userId, userId));
         return Lists;
     } catch (error) {
         console.error('Error fetching lists:', error);
