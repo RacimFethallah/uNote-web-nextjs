@@ -66,7 +66,7 @@ interface User {
     email: string;
 }
 
-export default function Aside({ lists, Notes, user }: { lists: List[], Notes: Note[], user: User}) {
+export default function Aside({ lists, Notes, user }: { lists: List[], Notes: Note[], user: User }) {
     console.log(lists)
 
 
@@ -163,7 +163,7 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                                         <DropdownMenuItem
                                             className="cursor-pointer"
                                             onClick={async () => {
-                                            
+
                                                 await logout();
                                                 // redirect('/');
                                             }}
@@ -234,9 +234,10 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                                     <ul className='space-y-3 pt-3'>
                                         {Notes.filter(note => note.listId === parseInt(selectedList.id)).slice().reverse().map(note => (
                                             <Link
+                                                key={note.id}
                                                 href={`home?listId=${selectedList.id}&listName=${selectedList.name}&noteId=${note.id}`}>
                                                 <Card
-                                                    key={note.id}
+
                                                     className={`hover:cursor-pointer group hover:bg-slate-50 transition-all mb-3 duration-300 ${selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
                                                         }`}
                                                     style={{ overflow: 'hidden' }}

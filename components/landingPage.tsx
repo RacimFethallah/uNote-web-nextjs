@@ -66,7 +66,7 @@ const Login = () => {
         <CardFooter className="flex flex-col gap-y-3 ">
           <Button variant="outline" className="w-full"><FcGoogle size={20} /></Button>
           <hr className="w-full" />
-          <div className="text-sm">Don't have an account?</div>
+          <div className="text-sm">Don&apos;t have an account?</div>
           <Button className="w-full" variant="outline" onClick={() => router.push('?method=register')}>
             Register
           </Button>
