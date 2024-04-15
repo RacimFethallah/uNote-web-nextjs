@@ -4,12 +4,18 @@ import { CiViewList } from "react-icons/ci";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { BsThreeDots } from "react-icons/bs";
 import { FaTrash } from "react-icons/fa";
-import { deleteList, getNotesCountForList } from "@/app/actions";
+import { deleteList, getNotesCountForList } from "@/actions/actions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface List {
     id: number;
+    name: string;
+}
+
+interface SelectedList {
+    id: string;
     name: string;
 }
 
@@ -18,7 +24,7 @@ interface ListItemProps {
     name: string;
     onClick: () => void;
     notes: number;
-    selectedList: List | null;
+    selectedList: SelectedList | null;
 }
 
 export default function ListItem({ id, name, onClick, notes, selectedList }: ListItemProps) {
@@ -31,8 +37,11 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
     };
 
     return (
-        <li
-            className={`p-3 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg group ${selectedList?.id === id ? 'bg-white' : ''}`}
+        <Link
+            href={`home?listId=${id}&listName=${name}`}
+            // href={`?list=${name}`}
+            // href={`/list/${id}`}
+            className={`p-3  flex items-center gap-3 hover:bg-black hover:text-white hover:cursor-pointer rounded-lg group ${selectedList?.name === name ? 'bg-black text-white shadow-2xl' : ''}`}
             onClick={() => handleClick()}
         >
             <CiViewList size={24} />
@@ -41,14 +50,14 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
             </span>
 
             {notes > 0 && (
-                <span className=' rounded-lg bg-slate-200 px-1.5 '>
+                <span className=' rounded-lg bg-slate-200 px-1.5 text-black '>
                     {notes}
                 </span>
             )}
 
 
             <DropdownMenu>
-                <DropdownMenuTrigger className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <DropdownMenuTrigger className="ml-auto text-gray-500 opacity-0 group-hover:opacity-100 text-white transition-opacity duration-300">
                     <BsThreeDots size={20} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -62,6 +71,6 @@ export default function ListItem({ id, name, onClick, notes, selectedList }: Lis
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </li>
+        </Link>
     );
 }

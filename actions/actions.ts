@@ -3,39 +3,41 @@
 import { db } from "@/db/db";
 import { lists, notes } from "@/db/schema";
 import { count, sql } from 'drizzle-orm';
-import { eq, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
+import { eq, and, lt, gte, ne, or, asc, desc } from 'drizzle-orm';
 import { revalidatePath } from "next/cache";
+import { getSession } from "./auth";
 
 
 export const deleteEverything = async () => {
     try {
-      await db.delete(notes);
-      await db.delete(lists);
-      const remainingLists = await db.select().from(lists);
-      console.log('Everything deleted');
-      console.log('Remaining lists:', remainingLists);
+        await db.delete(notes);
+        await db.delete(lists);
+        const remainingLists = await db.select().from(lists);
+        console.log('Everything deleted');
+        console.log('Remaining lists:', remainingLists);
     } catch (error) {
-      console.error('Error deleting everything:', error);
+        console.error('Error deleting everything:', error);
     }
-  };
+};
 
 export const setupDefaultLists = async () => {
+    const session = await getSession();
+    const userId = session.user[0].id;
+
     try {
         const defaultLists = [
-            { id: 0, name: 'Favoris' },
-            { id: 1, name: 'Mes Notes' },
+            { id: 0, name: 'Favoris', userId: userId },
+            { id: 1, name: 'Mes Notes', userId: userId },
         ];
 
 
         const existingLists = await db
             .select()
             .from(lists)
-            .where(or(...defaultLists.map((list) => eq(lists.id, list.id))));
+            .where(or(...defaultLists.map((list) => and(eq(lists.id, list.id), eq(lists.userId, userId)))));
 
-        const alllists = await db.select().from(lists);
+        const alllists = await db.select().from(lists).where(eq(lists.userId, userId));
 
-        console.log('All lists' , alllists);
-        console.log('Existing lists:', existingLists);
 
         const missingLists = defaultLists.filter(
             (list) => !existingLists.some((existingList) => existingList.name === list.name)
@@ -49,21 +51,20 @@ export const setupDefaultLists = async () => {
             console.log('Default lists created');
         }
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error setting up default lists:', error);
     }
-};
-
-
-
+}
 export async function addNewList(listName: string) {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         await db
             .insert(lists)
-            .values({ name: listName.trim() });
+            .values({ name: listName.trim(), userId: userId });
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error inserting new list:', error);
         throw error;
@@ -71,12 +72,14 @@ export async function addNewList(listName: string) {
 };
 
 export async function addNewNote(noteTitle: string, listId: number) {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
-        const insertedNote =await db
+        const insertedNote = await db
             .insert(notes)
-            .values({ title: noteTitle.trim(), listId: listId, content: '' }).returning();
+            .values({ title: noteTitle.trim(), listId: listId, userId: userId , content: '' }).returning();
 
-        revalidatePath('/');
+        revalidatePath('/home');
         return insertedNote;
     } catch (error) {
         console.error('Error inserting new note:', error);
@@ -92,7 +95,7 @@ export async function deleteList(listId: number) {
             .where(eq(lists.id, listId));
 
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error deleting list:', error);
         throw error;
@@ -107,7 +110,7 @@ export async function deleteNote(noteId: number) {
             .delete(notes)
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error deleting note:', error);
         throw error;
@@ -116,12 +119,13 @@ export async function deleteNote(noteId: number) {
 
 
 export async function fetchLists() {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         const Lists = await db
             .select()
             .from(lists)
-            // .orderBy(lists.name.asc)
-            .all();
+            .where(eq(lists.userId, userId));
         return Lists;
     } catch (error) {
         console.error('Error fetching lists:', error);
@@ -130,8 +134,10 @@ export async function fetchLists() {
 }
 
 export async function fetchNotesFromList(listId: number) {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
-        const Notes = (await db.select().from(notes).where(eq(notes.listId, listId))).toReversed();
+        const Notes = (await db.select().from(notes).where(and(eq(notes.listId, listId), eq(notes.userId, userId)))).toReversed();
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -142,12 +148,13 @@ export async function fetchNotesFromList(listId: number) {
 
 
 export async function fetchNotes() {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         const Notes = await db
             .select()
             .from(notes)
-            // .orderBy(lists.name.asc)
-            .all();
+            .where(eq(notes.userId, userId));
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -157,7 +164,7 @@ export async function fetchNotes() {
 
 export async function getNotesCountForList(listId: number) {
     const notesCount = await db.select({ count: sql<number>`count(*)` }).from(notes).where(eq(notes.listId, listId));
-    revalidatePath('/');
+    revalidatePath('/home');
     return notesCount;
 }
 
@@ -170,7 +177,7 @@ export async function updateNote(noteId: number, content: string, updatedAt: str
             .set({ content: content, updatedAt: updatedAt })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;
@@ -178,14 +185,14 @@ export async function updateNote(noteId: number, content: string, updatedAt: str
 }
 
 
-export async function addToFavorite(noteId: number){
+export async function addToFavorite(noteId: number) {
     try {
         await db
             .update(notes)
             .set({ listId: 0 })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;
@@ -195,14 +202,14 @@ export async function addToFavorite(noteId: number){
 
 
 
-export async function removeFromFavorite(noteId: number){
+export async function removeFromFavorite(noteId: number) {
     try {
         await db
             .update(notes)
             .set({ listId: 1 })
             .where(eq(notes.id, noteId));
 
-        revalidatePath('/');
+        revalidatePath('/home');
     } catch (error) {
         console.error('Error updating note:', error);
         throw error;
