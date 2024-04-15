@@ -10,9 +10,9 @@ export default async function Home() {
   const session = await getSession();
   console.log(session)
   
-  //if(session){
-  //  redirect('/home');
-  //}
+  if(session){
+   redirect('/home');
+  }
 
   return (
     <>

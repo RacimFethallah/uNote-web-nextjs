@@ -4,6 +4,8 @@ import { getSession } from "@/actions/auth";
 import Aside from "@/components/aside";
 import Main from "@/components/main";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable";
+import { redirect } from "next/navigation";
+
 
 
 
@@ -11,6 +13,10 @@ import { ResizableHandle, ResizablePanelGroup } from "@/components/ui/resizable"
 
 export default async function Home() {
   const session = await getSession();
+
+  if(!session){
+    redirect('/');
+  }
 
   const user = {id: session.user[0].id, username: session.user[0].username, email: session.user[0].email}
   

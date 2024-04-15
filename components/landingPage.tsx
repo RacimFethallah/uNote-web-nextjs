@@ -34,7 +34,7 @@ const Login = () => {
       toast.error(response.message);
     } else if (response) {
       toast.success(response.message);
-      //router.replace('/home');
+      router.replace('/home');
     }
   }
 

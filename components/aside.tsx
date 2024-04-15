@@ -165,7 +165,7 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                                             onClick={async () => {
                                             
                                                 await logout();
-                                                redirect('/');
+                                                // redirect('/');
                                             }}
                                         >
                                             <div className="flex flex-row text-red-500 items-center gap-5">
