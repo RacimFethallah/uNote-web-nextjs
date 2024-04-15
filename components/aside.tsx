@@ -203,10 +203,12 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                                         {lists.filter(list => list.name !== 'Favoris' && list.name !== 'Mes Notes').map((list, index) => (
                                             <React.Fragment key={index}>
                                                 <ListItem
-                                                    {...list}
+                                                    id={list.id}
+                                                    name={list.name}
                                                     onClick={() => handleListItemClick(list)}
                                                     notes={Notes.filter((note) => note.listId === list.id).length}
-                                                    selectedList={selectedList} />
+                                                    selectedList={selectedList}
+                                                />
                                             </React.Fragment>
                                         ))}
                                     </ul>
