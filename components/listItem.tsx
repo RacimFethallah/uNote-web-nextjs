@@ -9,10 +9,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface List {
-    id: number;
-    name: string;
-}
 
 interface SelectedList {
     id: string;
