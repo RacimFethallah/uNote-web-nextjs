@@ -237,7 +237,7 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                                                 href={`home?listId=${selectedList.id}&listName=${selectedList.name}&noteId=${note.id}`}>
                                                 <Card
                                                     key={note.id}
-                                                    className={`hover:cursor-pointer group hover:bg-slate-50 transition-all duration-300 ${selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
+                                                    className={`hover:cursor-pointer group hover:bg-slate-50 transition-all mb-3 duration-300 ${selectedNote !== null && parseInt(selectedNote) === note.id ? 'bg-slate-50 border-black' : 'bg-white'
                                                         }`}
                                                     style={{ overflow: 'hidden' }}
                                                 >
