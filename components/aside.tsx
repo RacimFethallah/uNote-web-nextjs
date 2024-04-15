@@ -179,42 +179,24 @@ export default function Aside({ lists, Notes, user }: { lists: List[], Notes: No
                             <ScrollArea className="flex-1 overflow-y-auto">
                                 <nav className="p-2 text-base">
                                     <ul className='space-y-2'>
-                                        {/* <li
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Favoris' ? 'bg-white' : ''}`}
-                                            onClick={() => handleListItemClick(lists.find((list) => list.name === 'Favoris') as List)}
-                                        >
-                                            <CiStar size={24} /> Favoris
-                                            {getNoteCount('Favoris') > 0 && (
-                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Favoris')}</span>
-                                            )}
-                                        </li>
-                                        <li
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList?.name === 'Mes Notes' ? 'bg-white' : ''}`}
-                                            onClick={() => handleListItemClick(lists.find((list) => list.name === 'Mes Notes') as List)}
-                                        >
-                                            <CiStickyNote size={24} /> Mes notes
-                                            {getNoteCount('Mes Notes') > 0 && (
-                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Mes Notes')}</span>
-                                            )}
-                                        </li> */}
                                         <Link
                                             href={`home?listId=0&listName=Favoris`}
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Favoris' ? 'bg-white' : ''}`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-black hover:text-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Favoris' ? 'bg-black text-white shadow-2xl' : ''}`}
 
                                         >
                                             <CiStar size={24} /> Favoris
                                             {getNoteCount('Favoris') > 0 && (
-                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Favoris')}</span>
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto text-black ">{getNoteCount('Favoris')}</span>
                                             )}
                                         </Link>
                                         <Link
                                             href={`home?listId=1&listName=Mes Notes`}
-                                            className={`p-4 flex items-center gap-3 hover:bg-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Mes Notes' ? 'bg-white' : ''}`}
+                                            className={`p-4 flex items-center gap-3 hover:bg-black hover:text-white hover:cursor-pointer rounded-lg ${selectedList.name === 'Mes Notes' ? 'bg-black text-white shadow-2xl' : ''}`}
 
                                         >
                                             <CiStickyNote size={24} /> Mes notes
                                             {getNoteCount('Mes Notes') > 0 && (
-                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto ">{getNoteCount('Mes Notes')}</span>
+                                                <span className=" rounded-lg bg-slate-200 px-1.5 ml-auto text-black">{getNoteCount('Mes Notes')}</span>
                                             )}
                                         </Link>
                                         <hr />

@@ -72,10 +72,12 @@ export async function addNewList(listName: string) {
 };
 
 export async function addNewNote(noteTitle: string, listId: number) {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         const insertedNote = await db
             .insert(notes)
-            .values({ title: noteTitle.trim(), listId: listId, content: '' }).returning();
+            .values({ title: noteTitle.trim(), listId: listId, userId: userId , content: '' }).returning();
 
         revalidatePath('/home');
         return insertedNote;
@@ -132,8 +134,10 @@ export async function fetchLists() {
 }
 
 export async function fetchNotesFromList(listId: number) {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
-        const Notes = (await db.select().from(notes).where(eq(notes.listId, listId))).toReversed();
+        const Notes = (await db.select().from(notes).where(and(eq(notes.listId, listId), eq(notes.userId, userId)))).toReversed();
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -144,12 +148,13 @@ export async function fetchNotesFromList(listId: number) {
 
 
 export async function fetchNotes() {
+    const session = await getSession();
+    const userId = session.user[0].id;
     try {
         const Notes = await db
             .select()
             .from(notes)
-            // .orderBy(lists.name.asc)
-            .all();
+            .where(eq(notes.userId, userId));
         return Notes;
     } catch (error) {
         console.error('Error fetching notes:', error);

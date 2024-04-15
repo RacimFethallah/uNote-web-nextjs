@@ -15,7 +15,7 @@ export default function LandingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const method = searchParams.get("method") ?? "login";
-  
+
 
   return (
     <main className="flex items-center justify-center h-screen bg-slate-200">
@@ -72,6 +72,7 @@ const Login = () => {
           </Button>
         </CardFooter>
       </Card>
+      <Toaster richColors position="top-center" />
     </motion.div>
   );
 };
@@ -125,7 +126,7 @@ const Register = () => {
           </Button>
         </CardFooter>
       </Card>
-      <Toaster richColors />
+      <Toaster richColors position="top-center" />
 
     </motion.div>
   );

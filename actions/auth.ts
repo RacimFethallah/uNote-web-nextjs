@@ -44,14 +44,13 @@ export async function loginUser(formData: FormData) {
     // Verify credentials && get the user
 
     const email = formData.get('email') as string;
-    console.log("email: ", email)
     const password = formData.get('password') as string;
 
     const user = await getUserByEmail(email);
 
-    console.log("user:", user);
 
-    if (!user) {
+    if (!user || !user[0]) {
+        console.log('nothing to see here')
         return { error: 'User not found', message: 'User not found' };
     }
 

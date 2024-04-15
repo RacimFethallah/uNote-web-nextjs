@@ -14,6 +14,7 @@ export const users = sqliteTable('users', {
 export const notes = sqliteTable('notes', {
     id: integer('id' , { mode: 'number' }).primaryKey({ autoIncrement: true }).notNull(),
     listId: integer('listId').notNull().references(() => lists.id, {onDelete: 'cascade'}),
+    userId: integer('userId').notNull().references(() => users.id, {onDelete: 'cascade'}),
     title: text('title').notNull(),
     content: text('content').notNull(),
     createdAt: text("createdAt").default(sql`(CURRENT_DATE)`).notNull(),
